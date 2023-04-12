@@ -82,6 +82,7 @@ class GenerateRequest(BaseModel):
     #stop: Optional[str] = None
     stream: Optional[bool] = False
     return_prompt: Optional[bool] = False
+    add_bos_token: Optional[str] = ""
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
@@ -125,6 +126,7 @@ async def generate(req: GenerateRequest):
         'length_penalty': req.length_penalty,
         'early_stopping': req.early_stopping,
         'seed': req.seed,
+        'add_bos_token': req.add_bos_token
     }
 
     print(generate_params)
