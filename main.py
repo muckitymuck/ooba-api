@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, Request
 from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
-from sse_starlette.sse import EventSourceResponse
+#from sse_starlette.sse import EventSourceResponse
 
 
 def model_check():
@@ -41,6 +41,7 @@ def model_check():
             print()
         shared.model_name = available_models[i]
 
+
 # Setup FastAPI:
 app = FastAPI()
 
@@ -52,53 +53,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class GenerateRequest(BaseModel):
-    prompt: str
-    max_tokens: Optional[int] = None
-    temperature: Optional[float] = None
-    top_p: Optional[float] = None
-    #top_k: Optional[float] = None
-    n: Optional[int] = None
-    stop: Optional[str] = None
-    stream: Optional[bool] = False
-
-@app.get("/")
-def hellow_world(q: Union[str, None] = None):
-    return {"wintermute": "ai", "q": q}
-
-
-# ability to save in a local database for future training.
-# in generate strip to the last . rather than ending in the middle of a sentence. (?)
-@app.post("/generate")
-async def generate(req: GenerateRequest):
-    req.stream = False
-    req.prompt = req.prompt
-    req.temperature = req.temperature or 0.7
-    req.stop = req.stop or "\n"
-
-    prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-### Instruction:
-{0}
-### Response:
-""".format(req.prompt)
-
-    #print(req.prompt)
-    #print("---")
-    #print(prompt)
-    #print("-------")
-
-    prompt_lines = [k.strip() for k in prompt.split('\n')]
-    max_context = 2048
-    #max_context = body.get('max_context_length', 2048)
-
-    # enforce context length...
-    #while len(prompt_lines) >= 0 and len(encode('\n'.join(prompt_lines))) > max_context:
-    #    prompt_lines.pop(0)
-
-    prompt = '\n'.join(prompt_lines)
-    #print(prompt)
-
-    # Llama-Precise:
+# Llama-Precise:
     #do_sample=True
     #top_p=0.1
     #top_k=40
@@ -106,24 +61,72 @@ async def generate(req: GenerateRequest):
     #repetition_penalty=1.18
     #typical_p=1.0
 
+class GenerateRequest(BaseModel):
+    prompt: str
+    max_new_tokens: Optional[int] = 200
+    do_sample: Optional[bool] = True
+    temperature: Optional[float] = 0.7
+    top_p: Optional[float] = 0.1
+    typical_p: Optional[float] = 1
+    repetition_penalty: Optional[float] = 1.18
+    encoder_repetition_penalty: Optional[float] = 1
+    top_k: Optional[float] = 40
+    min_length: Optional[int] = 0
+    no_repeat_ngram_size: Optional[float] = 0 #int?
+    num_beams: Optional[int] = 1
+    penalty_alpha: Optional[float] = 0 #int
+    length_penalty: Optional[float] = 1 #int
+    early_stopping: Optional[bool] = False
+    seed: Optional[int] = -1
+    #n: Optional[int] = None
+    #stop: Optional[str] = None
+    stream: Optional[bool] = False
+
+@app.get("/")
+def hellow_world(q: Union[str, None] = None):
+    return {"wintermute": "ai", "q": q}
+
+
+# in generate strip to the last . rather than ending in the middle of a sentence. (?)
+@app.post("/generate")
+async def generate(req: GenerateRequest):
+    #print(req.prompt)
+    prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+### Instruction:
+{0}
+### Response:
+""".format(req.prompt)
+    #print(prompt)
+
+    prompt_lines = [k.strip() for k in prompt.split('\n')]
+
+    #max_context = 2048
+    # enforce context length...
+    #while len(prompt_lines) >= 0 and len(encode('\n'.join(prompt_lines))) > max_context:
+    #    prompt_lines.pop(0)
+
+    prompt = '\n'.join(prompt_lines)
+
     # need to allow over-ride from params passed in from user, lol
     generate_params = {
-        'max_new_tokens': 100,
-        'do_sample': True,
-        'temperature': 0.7,
-        'top_p': 0.1,
-        'typical_p': 1,
-        'repetition_penalty': 1.18,
-        'encoder_repetition_penalty': 1,
-        'top_k': 40,
-        'min_length': 0,
-        'no_repeat_ngram_size': 0,
-        'num_beams': 1,
-        'penalty_alpha': 0,
-        'length_penalty': 1,
-        'early_stopping': False,
-        'seed': -1,
+        'max_new_tokens': req.max_new_tokens,
+        'do_sample': req.do_sample,
+        'temperature': req.temperature,
+        'top_p': req.top_p,
+        'typical_p': req.typical_p,
+        'repetition_penalty': req.repetition_penalty,
+        'encoder_repetition_penalty': req.encoder_repetition_penalty,
+        'top_k': req.top_k,
+        'min_length': req.min_length,
+        'no_repeat_ngram_size': req.no_repeat_ngram_size,
+        'num_beams': req.num_beams,
+        'penalty_alpha': req.penalty_alpha,
+        'length_penalty': req.length_penalty,
+        'early_stopping': req.early_stopping,
+        'seed': req.seed,
     }
+
+    print(generate_params)
 
     generator = generate_reply(
         prompt,
@@ -167,7 +170,7 @@ if __name__ == "__main__":
     # load model
     shared.model, shared.tokenizer = load_model(shared.model_name)
 
-    #python server.py --auto-devices --wbits 4  --groupsize 128 --model_type llama
+    #python main.py --wbits 4  --groupsize 128 --model_type llama
     
     uvicorn.run(
         app,
