@@ -1,130 +1,46 @@
-# Text generation web UI
+# Drop-in FastAPI wrapper for (oobabooga/text-generation-webui):
+If you already have text-generation-webui set up you can just copy the `main.py` from this repo into your folder and you should be good to go!
 
-A gradio web UI for running Large Language Models like LLaMA, llama.cpp, GPT-J, Pythia, OPT, and GALACTICA.
+> pip install fastapi
+> python main.py --wbits 4  --groupsize 128 --model_type llama --xformers
 
-Its goal is to become the [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) of text generation.
+You can call it with the same args as `server.py` from ooba.
 
-|![Image1](https://github.com/oobabooga/screenshots/raw/main/qa.png) | ![Image2](https://github.com/oobabooga/screenshots/raw/main/cai3.png) |
-|:---:|:---:|
-|![Image3](https://github.com/oobabooga/screenshots/raw/main/gpt4chan.png) | ![Image4](https://github.com/oobabooga/screenshots/raw/main/galactica.png) |
+# Purpose:
+I want to write a FastAPI wrapper for Llama server running on GPU (without Gradio)
 
-## Features
-
-* Dropdown menu for switching between models
-* Notebook mode that resembles OpenAI's playground
-* Chat mode for conversation and role playing
-* Instruct mode compatible with Alpaca, Vicuna, and Open Assistant formats **\*NEW!\***
-* Nice HTML output for GPT-4chan
-* Markdown output for [GALACTICA](https://github.com/paperswithcode/galai), including LaTeX rendering
-* [Custom chat characters](https://github.com/oobabooga/text-generation-webui/wiki/Custom-chat-characters)
-* Advanced chat features (send images, get audio responses with TTS)
-* Very efficient text streaming
-* Parameter presets
-* 8-bit mode
-* Layers splitting across GPU(s), CPU, and disk
-* CPU mode
-* [FlexGen](https://github.com/oobabooga/text-generation-webui/wiki/FlexGen)
-* [DeepSpeed ZeRO-3](https://github.com/oobabooga/text-generation-webui/wiki/DeepSpeed)
-* API [with](https://github.com/oobabooga/text-generation-webui/blob/main/api-example-stream.py) streaming and [without](https://github.com/oobabooga/text-generation-webui/blob/main/api-example.py) streaming
-* [LLaMA model, including 4-bit GPTQ](https://github.com/oobabooga/text-generation-webui/wiki/LLaMA-model)
-* [llama.cpp](https://github.com/oobabooga/text-generation-webui/wiki/llama.cpp-models) **\*NEW!\***
-* [RWKV model](https://github.com/oobabooga/text-generation-webui/wiki/RWKV-model)
-* [LoRA (loading and training)](https://github.com/oobabooga/text-generation-webui/wiki/Using-LoRAs)
-* Softprompts
-* [Extensions](https://github.com/oobabooga/text-generation-webui/wiki/Extensions)
-
-## Installation
-
-### One-click installers
-
-[oobabooga-windows.zip](https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga-windows.zip)
-
-Just download the zip above, extract it, and double click on "install". The web UI and all its dependencies will be installed in the same folder.
-
-* To download a model, double click on "download-model"
-* To start the web UI, double click on "start-webui" 
-
-Source codes: https://github.com/oobabooga/one-click-installers
-
-> **Note**
-> 
-> Thanks to [@jllllll](https://github.com/jllllll) and [@ClayShoaf](https://github.com/ClayShoaf), the Windows 1-click installer now sets up 8-bit and 4-bit requirements out of the box. No additional installation steps are necessary.
-
-> **Note**
-> 
-> There is no need to run the installer as admin.
-
-### Manual installation using Conda
-
-Recommended if you have some experience with the command-line.
-
-On Windows, I additionally recommend carrying out the installation on WSL instead of the base system: [WSL installation guide](https://github.com/oobabooga/text-generation-webui/wiki/WSL-installation-guide).
-
-#### 0. Install Conda
-
-https://docs.conda.io/en/latest/miniconda.html
-
-On Linux or WSL, it can be automatically installed with these two commands:
-
+# Install:
 ```
-curl -sL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" > "Miniconda3.sh"
-bash Miniconda3.sh
-```
-Source: https://educe-ubc.github.io/conda.html
+conda create -n llm-api python=3.10.9
+conda activate llm-api
 
-#### 0.1 (Ubuntu/WSL) Install build tools
-
-```
-sudo apt install build-essential
+conda install cudatoolkit
+pip install torch torchvision torchaudio
 ```
 
-
-#### 1. Create a new conda environment
-
+**#  Clone this repo (disarmyouwitha/llm-api-gpu):**
 ```
-conda create -n textgen python=3.10.9
-conda activate textgen
-```
-
-#### 2. Install Pytorch
-
-| System | GPU | Command |
-|--------|---------|---------|
-| Linux/WSL | NVIDIA | `pip3 install torch torchvision torchaudio` |
-| Linux | AMD | `pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.4.2` |
-| MacOS + MPS (untested) | Any | `pip3 install torch torchvision torchaudio` |
-
-The up to date commands can be found here: https://pytorch.org/get-started/locally/. 
-
-#### 2.1 Special instructions
-
-* MacOS users: https://github.com/oobabooga/text-generation-webui/pull/393
-* AMD users: https://rentry.org/eq3hg
-
-#### 3. Install the web UI
-
-```
-git clone https://github.com/oobabooga/text-generation-webui
-cd text-generation-webui
+git clone https://github.com/disarmyouwitha/llm-api
+cd llm-api
 pip install -r requirements.txt
 ```
 
-> **Note**
-> 
-> For bitsandbytes and `--load-in-8bit` to work on Linux/WSL, this dirty fix is currently necessary: https://github.com/oobabooga/text-generation-webui/issues/400#issuecomment-1474876859
-
-
-### Alternative: manual Windows installation
-
-As an alternative to the recommended WSL method, you can install the web UI natively on Windows using this guide. It will be a lot harder and the performance may be slower: [Windows installation guide](https://github.com/oobabooga/text-generation-webui/wiki/Windows-installation-guide).
-
-### Alternative: Docker
-
+**# (qwopqwop200/GPTQ-for-LLaMa):**
 ```
-cp .env.example .env
-docker compose up --build
+mkdir repositories
+cd repositories
+git clone https://github.com/qwopqwop200/GPTQ-for-LLaMa GPTQ-for-LLaMa
+cd GPTQ-for-LLaMa
+pip install -r requirements.txt
+```
+**# start server:**
+```
+python server.py --model_type llama --wbits 4 --groupsize 128 
 ```
 
+<<<<<<< HEAD
+# BIG THANKS:
+=======
 Make sure to edit `.env.example` and set the appropriate CUDA version for your GPU, which can be found on [developer.nvidia.com](https://developer.nvidia.com/cuda-gpus).
 
 You need to have docker compose v2.17 or higher installed in your system. For installation instructions, see [Docker compose installation](https://github.com/oobabooga/text-generation-webui/wiki/Docker-compose-installation).
@@ -135,11 +51,14 @@ Contributed by [@loeken](https://github.com/loeken) in [#633](https://github.com
 
 From time to time, the `requirements.txt` changes. To update, use this command:
 
+>>>>>>> 47daf891feb08e794b0579cfd59665fc2dda4b6e
 ```
-conda activate textgen
-cd text-generation-webui
-pip install -r requirements.txt --upgrade
+https://github.com/oobabooga/text-generation-webui
+https://github.com/1b5d/llm-api
+https://github.com/abetlen/llama-cpp-python/tree/main/llama_cpp
 ```
+<<<<<<< HEAD
+=======
 ## Downloading models
 
 Models should be placed inside the `models` folder.
@@ -304,3 +223,4 @@ Before reporting a bug, make sure that you have:
 - Verbose preset: Anonymous 4chan user.
 - NovelAI and KoboldAI presets: https://github.com/KoboldAI/KoboldAI-Client/wiki/Settings-Presets
 - Code for early stopping in chat mode, code for some of the sliders: https://github.com/PygmalionAI/gradio-ui/
+>>>>>>> 1d8526849bfa6f1801da70912a875ae111c1e5af
