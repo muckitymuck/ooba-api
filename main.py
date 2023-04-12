@@ -81,6 +81,7 @@ class GenerateRequest(BaseModel):
     #n: Optional[int] = None
     #stop: Optional[str] = None
     stream: Optional[bool] = False
+    return_prompt: Optional[bool] = False
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
