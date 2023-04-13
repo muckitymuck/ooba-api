@@ -83,7 +83,7 @@ class GenerateRequest(BaseModel):
     stream: Optional[bool] = False
     return_prompt: Optional[bool] = False
     add_bos_token: Optional[bool] = True
-    truncation_length: Optional[int] = 2048,
+    truncation_length: 2048,
     custom_stopping_strings: Optional[str] = '',
     ban_eos_token: Optional[bool] =False,
 
@@ -130,9 +130,9 @@ async def generate(req: GenerateRequest):
         'early_stopping': req.early_stopping,
         'seed': req.seed,
         'add_bos_token': req.add_bos_token,
-        'truncation_length': 2048,
-        'custom_stopping_strings': '',
-        'ban_eos_token': False,
+        'truncation_length': req.truncation_length,#2048,
+        'custom_stopping_strings': req.custom_stopping_strings,#'',
+        'ban_eos_token': req.ban_eos_token,#False,
     }
 
     print(generate_params)
