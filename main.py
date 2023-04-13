@@ -82,7 +82,7 @@ class GenerateRequest(BaseModel):
     #stop: Optional[str] = None
     stream: Optional[bool] = False
     return_prompt: Optional[bool] = False
-    add_bos_token: Optional[str] = ""
+    add_bos_token: Optional[bool] = True
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
