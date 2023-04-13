@@ -126,16 +126,17 @@ async def generate(req: GenerateRequest):
         'length_penalty': req.length_penalty,
         'early_stopping': req.early_stopping,
         'seed': req.seed,
-        'add_bos_token': req.add_bos_token
+        'add_bos_token': req.add_bos_token,
+        'truncation_length': 2048,
     }
 
     print(generate_params)
 
+    #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
     generator = generate_reply(
         prompt,
         generate_params,
         stopping_strings=[],
-        #stream=req.stream,
     )
 
     answer = ''
