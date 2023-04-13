@@ -128,6 +128,7 @@ async def generate(req: GenerateRequest):
         'seed': req.seed,
         'add_bos_token': req.add_bos_token,
         'truncation_length': 2048,
+        'custom_stopping_strings': '',
     }
 
     print(generate_params)
