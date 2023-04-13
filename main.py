@@ -101,7 +101,7 @@ def hellow_world(q: Union[str, None] = None):
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def generate(req: GenerateRequest):
-    #print(req.prompt)
+    print(req.prompt)
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
 {0}
