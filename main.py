@@ -79,9 +79,9 @@ class GenerateRequest(BaseModel):
     early_stopping: Optional[bool] = False
     seed: Optional[int] = -1
     #n: Optional[int] = None
-    #stop: Optional[str] = None
     stream: Optional[bool] = False
     return_prompt: Optional[bool] = False
+    #stop: Optional[str] = None
     add_bos_token: Optional[bool] = True
     truncation_length: 2048,
     custom_stopping_strings: Optional[str] = '',
@@ -130,17 +130,17 @@ async def generate(req: GenerateRequest):
         'early_stopping': req.early_stopping,
         'seed': req.seed,
         'add_bos_token': req.add_bos_token,
-        'truncation_length': req.truncation_length,#2048,
-        'custom_stopping_strings': req.custom_stopping_strings,#'',
-        'ban_eos_token': req.ban_eos_token,#False,
+        'truncation_length': req.truncation_length,
+        'custom_stopping_strings': req.custom_stopping_strings,
+        'ban_eos_token': req.ban_eos_token,
     }
-
-    print(generate_params)
+    #print(generate_params)
 
     #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
     generator = generate_reply(
         prompt,
         generate_params,
+        eos_token=None,
         stopping_strings=[],
     )
 
