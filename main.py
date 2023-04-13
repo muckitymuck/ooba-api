@@ -130,7 +130,7 @@ async def generate(req: GenerateRequest):
         'seed': req.seed,
         'add_bos_token': req.add_bos_token,
         'truncation_length': req.truncation_length,
-        'custom_stopping_strings': req.custon_stopping_strings,
+        'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
     }
     #print(generate_params)
