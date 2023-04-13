@@ -7,6 +7,7 @@ import transformers
 from pathlib import Path
 from modules import shared
 from modules.models import load_model
+from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
 from modules.text_generation import encode, generate_reply, stop_everything_event
 
@@ -18,6 +19,11 @@ from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
+
+# can use this in a fastAPI call to change lora?
+def load_lora_wrapper(selected_lora):
+    add_lora_to_model(selected_lora)
+    return selected_lora
 
 def model_check():
     # Get available models:
@@ -179,7 +185,11 @@ if __name__ == "__main__":
     # load model
     shared.model, shared.tokenizer = load_model(shared.model_name)
 
-    #python main.py --wbits 4  --groupsize 128 --model_type llama
+    if shared.args.lora:
+        add_lora_to_model(shared.args.lora)
+
+    #python main.py --model_type llama --wbits 4 --groupsize 128 --xformers
+    #python main.py --model_type llama --load-in-8bit --lora baize-lora-13B --xformers
     
     uvicorn.run(
         app,
