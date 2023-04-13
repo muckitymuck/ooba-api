@@ -85,7 +85,7 @@ class GenerateRequest(BaseModel):
     add_bos_token: Optional[bool] = True
     truncation_length: Optional[int] = 2048,
     custom_stopping_strings: Optional[str] = '',
-    ban_eos_token: Optional[bool] = False,
+    ban_eos_token: Optional[bool] =False,
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
@@ -112,6 +112,7 @@ async def generate(req: GenerateRequest):
 
     prompt = '\n'.join(prompt_lines)
 
+    # need to allow over-ride from params passed in from user, lol
     generate_params = {
         'max_new_tokens': req.max_new_tokens,
         'do_sample': req.do_sample,
@@ -129,17 +130,17 @@ async def generate(req: GenerateRequest):
         'early_stopping': req.early_stopping,
         'seed': req.seed,
         'add_bos_token': req.add_bos_token,
-        'truncation_length': req.truncation_length,
-        'custom_stopping_strings': req.custom_stopping_strings,
-        'ban_eos_token': req.ban_eos_token,
+        'truncation_length': 2048,
+        'custom_stopping_strings': '',
+        'ban_eos_token': False,
     }
-    #print(generate_params)
+
+    print(generate_params)
 
     #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
     generator = generate_reply(
         prompt,
         generate_params,
-        eos_token=None,
         stopping_strings=[],
     )
 
