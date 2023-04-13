@@ -83,7 +83,7 @@ class GenerateRequest(BaseModel):
     return_prompt: Optional[bool] = False
     #stop: Optional[str] = None
     add_bos_token: Optional[bool] = True
-    truncation_length: 2048
+    truncation_length: Optional[int] = 2048
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
 
