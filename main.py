@@ -129,6 +129,7 @@ async def generate(req: GenerateRequest):
         'add_bos_token': req.add_bos_token,
         'truncation_length': 2048,
         'custom_stopping_strings': '',
+        'ban_eos_token': False,
     }
 
     print(generate_params)
