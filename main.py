@@ -38,6 +38,7 @@ def model_check():
             sys.exit(0)
         elif len(available_models) == 1:
             i = 0
+            print("booya")
         else:
             print('The following models are available:\n')
             for i, model in enumerate(available_models):
@@ -161,11 +162,6 @@ async def generate(req: GenerateRequest):
             answer = a[0]
 
         #print(answer.replace(last_answer,""), end="", flush=True)
-
-
-    #self.wfile.write(response.encode('utf-8'))
-    #print(response.encode('utf-8'))
-    print()
 
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
