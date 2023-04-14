@@ -165,11 +165,9 @@ async def generate(req: GenerateRequest):
 
     #self.wfile.write(response.encode('utf-8'))
     #print(response.encode('utf-8'))
-    print(answer[len(req.prompt):])
-    print(answer[:len(req.prompt)])
-    print(answer.replace(req.prompt,""))
+    print()
 
-    return {"wintermute": "ai", "response": answer[len(req.prompt):]}
+    return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
 
 @app.get("/check")
