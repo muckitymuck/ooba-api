@@ -26,26 +26,6 @@ def get_available_models():
     else:
         return sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
 
-def get_model_specific_settings(model):
-    settings = shared.model_config
-    model_settings = {}
-
-    for pat in settings:
-        if re.match(pat, model.lower()):
-            for k in settings[pat]:
-                model_settings[k] = settings[pat][k]
-
-    return model_settings
-
-
-def load_model_specific_settings(model, state, return_dict=False):
-    model_settings = get_model_specific_settings(model)
-    for k in model_settings:
-        if k in state:
-            state[k] = model_settings[k]
-
-    return state
-
 
 # Setup FastAPI:
 app = FastAPI()
@@ -189,11 +169,8 @@ if __name__ == "__main__":
 
     # If any model has been selected, load it
     if shared.model_name != 'None':
-        model_settings = get_model_specific_settings(shared.model_name)
-        shared.settings.update(model_settings)  # hijacking the interface defaults
-
-        # Load the model
         shared.model, shared.tokenizer = load_model(shared.model_name)
+        #add lora
         if shared.args.lora:
             add_lora_to_model([shared.args.lora])
 
