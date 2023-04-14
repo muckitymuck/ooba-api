@@ -168,6 +168,8 @@ async def generate(req: GenerateRequest):
         }]
     })
 
+    answer = answer.replace(req.prompt, "")
+
     #self.wfile.write(response.encode('utf-8'))
     #print(response.encode('utf-8'))
 
