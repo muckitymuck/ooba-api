@@ -20,35 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
 
-# can use this in a fastAPI call to change lora?
-def load_lora_wrapper(selected_lora):
-    add_lora_to_model(selected_lora)
-    return selected_lora
-
-def model_check():
-    # Get available models:
-    available_models = sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
-
-    # Default model
-    if shared.args.model is not None:
-        shared.model_name = shared.args.model
-    else:
-        if len(available_models) == 0:
-            print('No models are available! Please download at least one.')
-            sys.exit(0)
-        elif len(available_models) == 1:
-            i = 0
-            print("booya")
-        else:
-            print('The following models are available:\n')
-            for i, model in enumerate(available_models):
-                print(f'{i+1}. {model}')
-            print(f'\nWhich one do you want to load? 1-{len(available_models)}\n')
-            i = int(input()) - 1
-            print()
-        shared.model_name = available_models[i]
-
-
 # Setup FastAPI:
 app = FastAPI()
 
@@ -60,13 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Llama-Precise:
-    #do_sample=True
-    #top_p=0.1
-    #top_k=40
-    #temperature=0.7
-    #repetition_penalty=1.18
-    #typical_p=1.0
 
 class GenerateRequest(BaseModel):
     prompt: str
@@ -171,14 +135,42 @@ def check():
     return "Ok"
 
 if __name__ == "__main__":
-    # model check:
-    model_check()
+    # get available models:
+    available_models = get_available_models()
 
-    # load model
-    shared.model, shared.tokenizer = load_model(shared.model_name)
+    # Model defined through --model
+    if shared.args.model is not None:
+        shared.model_name = shared.args.model
 
-    if shared.args.lora:
-        add_lora_to_model(shared.args.lora)
+    # Only one model is available
+    elif len(available_models) == 1:
+        shared.model_name = available_models[0]
+
+    # Select the model from a command-line menu
+    elif shared.args.model_menu:
+        if len(available_models) == 0:
+            print('No models are available! Please download at least one.')
+            sys.exit(0)
+        else:
+            print('The following models are available:\n')
+            for i, model in enumerate(available_models):
+                print(f'{i+1}. {model}')
+            print(f'\nWhich one do you want to load? 1-{len(available_models)}\n')
+            i = int(input()) - 1
+            print()
+        shared.model_name = available_models[i]
+
+    # If any model has been selected, load it
+    if shared.model_name != 'None':
+
+        model_settings = get_model_specific_settings(shared.model_name)
+        shared.settings.update(model_settings)  # hijacking the interface defaults
+        update_model_parameters(model_settings, initial=True)  # hijacking the command-line arguments
+
+        # Load the model
+        shared.model, shared.tokenizer = load_model(shared.model_name)
+        if shared.args.lora:
+            add_lora_to_model([shared.args.lora])
 
     #python main.py --model_type llama --wbits 4 --groupsize 128 --xformers
     #python main.py --model_type llama --load-in-8bit --lora baize-lora-13B --xformers
