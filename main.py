@@ -19,7 +19,47 @@ from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
+# Update the command-line arguments based on the interface values
+def update_model_parameters(state, initial=False):
+    elements = ui.list_model_elements()  # the names of the parameters
+    gpu_memories = []
 
+    for i, element in enumerate(elements):
+        if element not in state:
+            continue
+
+        value = state[element]
+        if element.startswith('gpu_memory'):
+            gpu_memories.append(value)
+            continue
+
+        if initial and vars(shared.args)[element] != vars(shared.args_defaults)[element]:
+            continue
+
+        # Setting null defaults
+        if element in ['wbits', 'groupsize', 'model_type'] and value == 'None':
+            value = vars(shared.args_defaults)[element]
+        elif element in ['cpu_memory'] and value == 0:
+            value = vars(shared.args_defaults)[element]
+
+        # Making some simple conversions
+        if element in ['wbits', 'groupsize', 'pre_layer']:
+            value = int(value)
+        elif element == 'cpu_memory' and value is not None:
+            value = f"{value}MiB"
+
+        exec(f"shared.args.{element} = value")
+
+    found_positive = False
+    for i in gpu_memories:
+        if i > 0:
+            found_positive = True
+            break
+
+    if found_positive:
+        shared.args.gpu_memory = [f"{i}MiB" for i in gpu_memories]
+    else:
+        shared.args.gpu_memory = None
 
 def get_available_models():
     if shared.args.flexgen:
