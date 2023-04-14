@@ -162,14 +162,12 @@ async def generate(req: GenerateRequest):
 
         #print(answer.replace(last_answer,""), end="", flush=True)
 
-    response = json.dumps({
-        'results': [{
-            'output': answer
-        }]
-    })
 
     #self.wfile.write(response.encode('utf-8'))
     #print(response.encode('utf-8'))
+    print(answer[len(req.prompt):])
+    print(answer[:len(req.prompt)])
+    print(answer.replace(req.prompt,""))
 
     return {"wintermute": "ai", "response": answer[len(req.prompt):]}
 
