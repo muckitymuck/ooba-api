@@ -20,6 +20,9 @@ from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
+from fastapi.responses import StreamingResponse
+import io
+
 # Tracking global variables here instead of shared:
 task_id = 0
 current_task = -1
@@ -210,18 +213,10 @@ def generate(req: GenerateRequest):
 {0}
 ### Response:
 """.format(req.prompt)
-    #print(prompt)
 
     prompt_lines = [k.strip() for k in prompt.split('\n')]
-
-    #max_context = 2048
-    # enforce context length...
-    #while len(prompt_lines) >= 0 and len(encode('\n'.join(prompt_lines))) > max_context:
-    #    prompt_lines.pop(0)
-
     prompt = '\n'.join(prompt_lines)
 
-    # need to allow over-ride from params passed in from user, lol
     generate_params = {
         'max_new_tokens': req.max_new_tokens,
         'do_sample': req.do_sample,
@@ -253,6 +248,9 @@ def generate(req: GenerateRequest):
         stopping_strings=[],
     )
 
+    return StreamingResponse(generator)
+
+    """
     answer = ''
     last_answer = ''
     for a in generator:
@@ -268,6 +266,7 @@ def generate(req: GenerateRequest):
 
     print(answer.replace(prompt,""))
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
+    """
 
 @app.post("/agenerate")
 async def agenerate(req: GenerateRequest):
