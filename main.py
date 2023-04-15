@@ -320,6 +320,7 @@ async def stream_data(req: GenerateRequest):
         stopping_strings=[],
     )
 
+    """
     answer = ''
     last_answer = ''
     for a in generator:
@@ -333,6 +334,7 @@ async def stream_data(req: GenerateRequest):
             answer = a[0]
 
         print(answer, flush=True)
+    """
     
     return StreamingResponse(generator)
 
