@@ -77,9 +77,9 @@ def finish_task():
     global finished_tasks
 
     finished_tasks.append(current_task)
+    print("task finished: {0}".format(current_task))
     current_task = -1
 
-    print("task finished: {0}".format(current_task))
     if len(finished_tasks) > 16:
         finished_tasks.pop(0)
 
@@ -258,8 +258,8 @@ def generate(req: GenerateRequest):
         else:
             answer = a[0]
 
-        # finish task in queue
-        finish_task()
+    # finish task in queue
+    finish_task()
 
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
