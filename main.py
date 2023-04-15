@@ -20,17 +20,25 @@ from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
-# we left off with working message queue.
-# we can queue a response with /queue
-# but how do we start the task?
-# (maybe a callback every 1 sec until the len(pending_tasks)==0?)
-
-
 # Tracking global variables here instead of shared:
 task_id = 0
 current_task = -1
 pending_tasks = {}
 finished_tasks = []
+
+def start_new_thread(callback_function):
+    new_thread = threading.Thread(target=callback_function)
+    new_thread.start()
+
+def _threaded_queue_callback():
+    global pending_tasks
+    print(pending_tasks)
+    print("callback")
+    
+    cnt = check_queue()
+    if cnt > 0:
+        time.sleep(5)
+        _threaded_queue_callback
 
 def check_queue():
     global pending_tasks
@@ -39,6 +47,9 @@ def check_queue():
     if len(pending_tasks)>=1:
         next_job = next(iter(pending_tasks))
         start_task(next_job)
+        return 1
+    else:
+        return 0
 
 def search_dict(dict, key):
     try:
