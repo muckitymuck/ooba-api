@@ -318,9 +318,13 @@ async def stream_data(req: GenerateRequest):
         # yield from queue. /queue should return stream
         # ...
 
+        _start = 0
+        _stop = 0
         answer = ""
+        answer_str = ""
         last_answer = ""
         for a in generator:
+            print("LA: {0}".format(last_answer), flush=True)
             last_answer = answer
 
             if isinstance(a, str):
@@ -330,7 +334,7 @@ async def stream_data(req: GenerateRequest):
 
             answer = answer.replace(prompt,"")
             #answer = answer.replace(last_answer,"")
-            print("LA: {0}".format(last_answer), flush=True)
+            
             print("a: {0}".format(answer), flush=True)
             yield answer.encode("utf-8")
 
