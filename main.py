@@ -179,6 +179,8 @@ def queue_job(req: GenerateRequest):
     # callback to handle pending tasks
     start_new_thread(_threaded_queue_callback)
 
+    # Maybe instead of starting a thread, we should just wait await a generate() here?
+
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="({0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
 
 
