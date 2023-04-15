@@ -320,6 +320,16 @@ async def stream_data(req: GenerateRequest):
         stopping_strings=[],
     )
 
+    # open generator in here and re-yield it?
+    async def gen():
+        for i in range(10):
+            # Generate some data
+            data = f"Data point {i}\n"
+            # Wait for a bit between each data point
+            await asyncio.sleep(0.5)
+            # Yield the data
+            yield data.encode("utf-8")
+
     """
     answer = ''
     last_answer = ''
@@ -335,8 +345,9 @@ async def stream_data(req: GenerateRequest):
 
         print(answer, flush=True)
     """
-    
-    return StreamingResponse(generator)
+
+    return StreamingResponse(gen)
+    #return StreamingResponse(generator)
 
 
 @app.post("/agenerate")
