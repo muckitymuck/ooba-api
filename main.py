@@ -319,6 +319,20 @@ async def stream_data(req: GenerateRequest):
         eos_token=None,
         stopping_strings=[],
     )
+
+    answer = ''
+    last_answer = ''
+    for a in generator:
+        size = sys.getsizeof(a)
+        print("size: {0}".format(size))
+        last_answer = answer
+
+        if isinstance(a, str):
+            answer = a
+        else:
+            answer = a[0]
+
+        print(answer, flush=True)
     
     return StreamingResponse(generator)
 
