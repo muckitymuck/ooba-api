@@ -32,13 +32,9 @@ def start_new_thread(callback_function):
 
 def _threaded_queue_callback():
     global pending_tasks
-    print(pending_tasks)
-    print("callback")
     
     cnt = check_queue()
-    #if cnt > 0:
-    #    time.sleep(5)
-    #    _threaded_queue_callback
+    print("callback: {0}".format(cnt))
 
 def check_queue():
     global pending_tasks
