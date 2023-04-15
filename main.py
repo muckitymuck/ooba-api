@@ -336,6 +336,7 @@ async def stream_data(req: GenerateRequest):
             #answer = answer.replace(last_answer,"")
             print("a: {0}".format(answer[_len:]), flush=True)
             last_answer = answer
+            _len = len(last_answer)
             yield answer.encode("utf-8")
 
     """
