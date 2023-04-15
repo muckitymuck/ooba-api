@@ -26,7 +26,7 @@ current_task = -1
 pending_tasks = {}
 finished_tasks = []
 
-def start_new_thread(callback_function):
+async def start_new_thread(callback_function):
     new_thread = threading.Thread(target=callback_function)
     new_thread.start()
 
@@ -36,13 +36,13 @@ def _threaded_queue_callback():
     check_queue()
     
 
-def check_queue():
+async def check_queue():
     global pending_tasks
     print(pending_tasks)
     
     if len(pending_tasks)>=1 and current_task==-1:
         next_job = next(iter(pending_tasks))
-        start_task(next_job)
+        await start_task(next_job)
         return 1
     else:
         return 0
@@ -65,7 +65,7 @@ def start_task(id_task):
     print("start job: {0}".format(id_task))
 
     # generate request
-    generate(req)
+    await generate(req)
 
 
 def finish_task():
@@ -202,7 +202,7 @@ def progress(req: ProgressRequest):
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
-def generate(req: GenerateRequest):
+async def generate(req: GenerateRequest):
     print(req.prompt)
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
