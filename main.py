@@ -54,7 +54,7 @@ def search_dict(dict, key):
     except ValueError:
         pass
 
-def start_task(id_task):
+async def start_task(id_task):
     global pending_tasks
     global current_task
     global time_start
