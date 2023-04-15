@@ -36,9 +36,9 @@ def _threaded_queue_callback():
     print("callback")
     
     cnt = check_queue()
-    if cnt > 0:
-        time.sleep(5)
-        _threaded_queue_callback
+    #if cnt > 0:
+    #    time.sleep(5)
+    #    _threaded_queue_callback
 
 def check_queue():
     global pending_tasks
@@ -79,6 +79,9 @@ def finish_task():
     finished_tasks.append(current_task)
     print("task finished: {0}".format(current_task))
     current_task = -1
+
+    # check queue for any more tasks:
+    check_queue()
 
     if len(finished_tasks) > 16:
         finished_tasks.pop(0)
@@ -172,6 +175,10 @@ def queue_job(req: GenerateRequest):
     active = int(task_id) == int(current_task)
     queued = int(task_id) in pending_tasks
     completed = int(task_id) in finished_tasks
+
+
+    # Queue has to recognize when we are the only person in queue and just start streaming, 
+    # and don't callback.     This should be an else to that:
 
     # callback to handle pending tasks
     start_new_thread(_threaded_queue_callback)
