@@ -12,6 +12,8 @@ from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
 from modules.text_generation import encode, generate_reply, stop_everything_event
 
+import asyncio
+
 import uvicorn
 from typing import Union
 from pydantic import BaseModel, Field
@@ -27,8 +29,17 @@ pending_tasks = {}
 finished_tasks = []
 
 async def start_new_thread(callback_function):
-    new_thread = threading.Thread(target=callback_function)
+    # Create a Future object that we can use to wait for the
+    # result of the blocking function.
+    future = asyncio.Future()
+
+    new_thread = threading.Thread(target=lambda: future.set_result(callback_function()))
     new_thread.start()
+
+    # Wait for the result of the blocking function to be set
+    # on the Future object.
+    result = await future
+    return result
 
 async def _threaded_queue_callback():
     global pending_tasks
