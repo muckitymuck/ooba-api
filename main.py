@@ -177,7 +177,7 @@ def queue_job(req: GenerateRequest):
     # and don't callback.     This should be an else to that:
 
     # callback to handle pending tasks
-    start_new_thread(_threaded_queue_callback)
+    await start_new_thread(_threaded_queue_callback)
 
     # Maybe instead of starting a thread, we should just wait await a generate() here?
 
