@@ -32,9 +32,9 @@ def start_new_thread(callback_function):
 
 def _threaded_queue_callback():
     global pending_tasks
+    print("callback")
+    check_queue()
     
-    cnt = check_queue()
-    print("callback: {0}".format(cnt))
 
 def check_queue():
     global pending_tasks
@@ -266,6 +266,7 @@ def generate(req: GenerateRequest):
     # finish task in queue
     finish_task()
 
+    print(answer.replace(prompt,""))
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
 @app.post("/agenerate")
