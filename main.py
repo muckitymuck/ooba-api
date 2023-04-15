@@ -304,6 +304,7 @@ async def stream_data(req: GenerateRequest):
 
     #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
     
+    # start generating response:
     generator = generate_reply(
         prompt,
         generate_params,
@@ -311,9 +312,10 @@ async def stream_data(req: GenerateRequest):
         stopping_strings=[],
     )
 
-    """
-    # open generator in here and re-yield it?
     async def gen():
+
+        # If in queue and not processing, start a different stream?
+        # ...
         for i in range(10):
             # Generate some data
             data = f"Data point {i}\n"
@@ -321,9 +323,7 @@ async def stream_data(req: GenerateRequest):
             await asyncio.sleep(0.5)
             # Yield the data
             yield data.encode("utf-8")
-    """
 
-    async def gen():
         answer = ""
         for a in generator:
             #size = sys.getsizeof(a)
