@@ -324,18 +324,17 @@ async def stream_data(req: GenerateRequest):
         answer_str = ""
         last_answer = ""
         for a in generator:
-            print("LA: {0}".format(last_answer), flush=True)
-            last_answer = answer
-
+            #print("LA: {0}".format(last_answer), flush=True)
+            
             if isinstance(a, str):
                 answer = a
             else:
                 answer = a[0]
 
             answer = answer.replace(prompt,"")
-            #answer = answer.replace(last_answer,"")
-            
+            answer = answer.replace(last_answer,"")
             print("a: {0}".format(answer), flush=True)
+            last_answer = answer
             yield answer.encode("utf-8")
 
     """
