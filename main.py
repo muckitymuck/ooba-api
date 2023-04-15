@@ -313,7 +313,7 @@ async def stream_data(req: GenerateRequest):
     )
 
     async def gen():
-        
+
         # If in queue and not processing, start a different stream?
         # yield from queue. /queue should return stream
         # ...
@@ -328,6 +328,7 @@ async def stream_data(req: GenerateRequest):
             else:
                 answer = a[0]
 
+            answer = answer.replace(prompt,"")
             answer = answer.replace(last_answer,"")
             print(answer, flush=True)
             yield answer.encode("utf-8")
