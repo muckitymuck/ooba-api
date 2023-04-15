@@ -12,8 +12,6 @@ from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
 from modules.text_generation import encode, generate_reply, stop_everything_event
 
-import asyncio
-
 import uvicorn
 from typing import Union
 from pydantic import BaseModel, Field
@@ -28,32 +26,23 @@ current_task = -1
 pending_tasks = {}
 finished_tasks = []
 
-async def start_new_thread(callback_function):
-    # Create a Future object that we can use to wait for the
-    # result of the blocking function.
-    future = asyncio.Future()
-
-    new_thread = threading.Thread(target=lambda: future.set_result(callback_function()))
+def start_new_thread(callback_function):
+    new_thread = threading.Thread(target=callback_function)
     new_thread.start()
 
-    # Wait for the result of the blocking function to be set
-    # on the Future object.
-    result = await future
-    return result
-
-async def _threaded_queue_callback():
+def _threaded_queue_callback():
     global pending_tasks
     print("callback")
-    await check_queue()
+    check_queue()
     
 
-async def check_queue():
+def check_queue():
     global pending_tasks
     print(pending_tasks)
     
     if len(pending_tasks)>=1 and current_task==-1:
         next_job = next(iter(pending_tasks))
-        await start_task(next_job)
+        start_task(next_job)
         return 1
     else:
         return 0
@@ -65,7 +54,7 @@ def search_dict(dict, key):
     except ValueError:
         pass
 
-async def start_task(id_task):
+def start_task(id_task):
     global pending_tasks
     global current_task
     global time_start
@@ -76,7 +65,7 @@ async def start_task(id_task):
     print("start job: {0}".format(id_task))
 
     # generate request
-    await generate(req)
+    generate(req)
 
 
 def finish_task():
@@ -169,7 +158,7 @@ def hellow_world(q: Union[str, None] = None):
 
 # call this instead of generate to join the queue.
 @app.post("/queue", response_model=ProgressResponse)
-async def queue_job(req: GenerateRequest):
+def queue_job(req: GenerateRequest):
     global current_task
     global pending_tasks
     global finished_tasks
@@ -188,7 +177,7 @@ async def queue_job(req: GenerateRequest):
     # and don't callback.     This should be an else to that:
 
     # callback to handle pending tasks
-    await start_new_thread(_threaded_queue_callback)
+    start_new_thread(_threaded_queue_callback)
 
     # Maybe instead of starting a thread, we should just wait await a generate() here?
 
@@ -213,7 +202,7 @@ def progress(req: ProgressRequest):
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
-async def generate(req: GenerateRequest):
+def generate(req: GenerateRequest):
     print(req.prompt)
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
