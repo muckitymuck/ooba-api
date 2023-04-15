@@ -14,7 +14,7 @@ from modules.text_generation import encode, generate_reply, stop_everything_even
 
 import uvicorn
 from typing import Union
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import FastAPI, Request
 from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
