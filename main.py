@@ -33,7 +33,7 @@ async def start_new_thread(callback_function):
 def _threaded_queue_callback():
     global pending_tasks
     print("callback")
-    check_queue()
+    await check_queue()
     
 
 async def check_queue():
