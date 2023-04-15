@@ -346,7 +346,7 @@ async def stream_data(req: GenerateRequest):
         print(answer, flush=True)
     """
 
-    return StreamingResponse(gen)
+    return StreamingResponse(gen())
     #return StreamingResponse(generator)
 
 
