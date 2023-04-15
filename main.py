@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import torch
+import threading
 import transformers
 from pathlib import Path
 from modules import shared
@@ -19,13 +20,63 @@ from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #from sse_starlette.sse import EventSourceResponse
 
+# we left off with working message queue.
+# we can queue a response with /queue
+# but how do we start the task?
+# (maybe a callback every 1 sec until the len(pending_tasks)==0?)
+
+
+# Tracking global variables here instead of shared:
+task_id = 0
+current_task = -1
+pending_tasks = {}
+finished_tasks = []
+
+def check_queue():
+    global pending_tasks
+    print(pending_tasks)
+    
+    if len(pending_tasks)>=1:
+        next_job = next(iter(pending_tasks))
+        start_task(next_job)
+
+def search_dict(dict, key):
+    try:
+        position = list(dict.keys()).index(int(key))
+        return position+1
+    except ValueError:
+        pass
+
+def start_task(id_task):
+    global pending_tasks
+    global current_task
+    global time_start
+
+    time_start = time.time()
+    current_task = id_task
+    req = pending_tasks.pop(id_task, None)
+    print("start job: {0}".format(id_task))
+
+    # generate request
+    generate(req)
+
+
+def finish_task():
+    global current_task
+    global finished_tasks
+
+    finished_tasks.append(current_task)
+    current_task = -1
+
+    print("task finished: {0}".format(current_task))
+    if len(finished_tasks) > 16:
+        finished_tasks.pop(0)
 
 def get_available_models():
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)
     else:
         return sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
-
 
 # Setup FastAPI:
 app = FastAPI()
@@ -37,6 +88,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class ProgressRequest(BaseModel):
+    id_task: str = Field(default=None, title="Task ID", description="id of the task to get progress for")
+
+
+class ProgressResponse(BaseModel):
+    active: bool = Field(title="Whether the task is being worked on right now")
+    queued: bool = Field(title="Whether the task is in queue")
+    completed: bool = Field(title="Whether the task has already finished")
+    #position in queue
+    progress: str = Field(default=None, title="Progress", description="The number of messages in the queue")
+    eta: float = Field(default=None, title="ETA in secs")
+    textinfo: str = Field(default=None, title="Info text", description="Info text used by WebUI.")
 
 
 class GenerateRequest(BaseModel):
@@ -65,15 +130,65 @@ class GenerateRequest(BaseModel):
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
 
+def add_task_to_queue(req: GenerateRequest):
+    global task_id
+    global pending_tasks
+
+    task_id = task_id+1
+
+    pending_tasks[task_id] = req
+    #pending_tasks[task_id] = time.time()
+
+    return task_id
+
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
     return {"wintermute": "ai", "q": q}
 
 
+# call this instead of generate to join the queue.
+@app.post("/queue", response_model=ProgressResponse)
+def queue_job(req: GenerateRequest):
+    global current_task
+    global pending_tasks
+    global finished_tasks
+
+    # add to queue:
+    task_id = add_task_to_queue(req)
+    print("queue task: {0}".format(task_id))
+
+    position = search_dict(pending_tasks, task_id)
+    active = int(task_id) == int(current_task)
+    queued = int(task_id) in pending_tasks
+    completed = int(task_id) in finished_tasks
+
+    # callback to handle pending tasks
+    start_new_thread(_threaded_queue_callback)
+
+    return ProgressResponse(active=active, queued=queued, completed=completed, progress="({0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
+
+
+@app.post("/internal/progress", response_model=ProgressResponse)
+def progress(req: ProgressRequest):
+    global current_task
+    global pending_tasks
+    global finished_tasks
+
+    position = search_dict(pending_tasks, req.id_task)
+    active = int(req.id_task) == int(current_task)
+    queued = int(req.id_task) in pending_tasks
+    completed = int(req.id_task) in finished_tasks
+    
+    if not active:
+        return ProgressResponse(active=active, queued=queued, completed=completed, progress="(pos {0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
+
+    return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
+
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def generate(req: GenerateRequest):
     print(req.prompt)
+
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
 {0}
@@ -132,10 +247,14 @@ async def generate(req: GenerateRequest):
         else:
             answer = a[0]
 
-        #print(answer.replace(last_answer,""), end="", flush=True)
+        # finish task in queue
+        finish_task()
 
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
+@app.post("/agenerate")
+async def agenerate(req: GenerateRequest):
+    print("stream.")
 
 @app.get("/check")
 def check():

@@ -12,9 +12,8 @@ data = {
     "temperature": 0.7,
 }
 
-r = requests.post("http://wintermute:7861/generate", data=json.dumps(data))
-#r = requests.post("http://localhost:7861/generate", data=json.dumps(data))
+#r = requests.post("http://wintermute:7861/queue", data=json.dumps(data))
+r = requests.post("http://localhost:7861/queue", data=json.dumps(data))
 print(r.status_code)
-print(r.status_code==200)
 if r.status_code==200:
     print(r.json())
