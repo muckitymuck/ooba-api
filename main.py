@@ -313,27 +313,22 @@ async def stream_data(req: GenerateRequest):
     )
 
     async def gen():
-
+        
         # If in queue and not processing, start a different stream?
+        # yield from queue. /queue should return stream
         # ...
-        for i in range(10):
-            # Generate some data
-            data = f"Data point {i}\n"
-            # Wait for a bit between each data point
-            await asyncio.sleep(0.5)
-            # Yield the data
-            yield data.encode("utf-8")
 
         answer = ""
+        last_answer = ""
         for a in generator:
-            #size = sys.getsizeof(a)
-            #print("size: {0}".format(size))
+            last_answer = answer
 
             if isinstance(a, str):
                 answer = a
             else:
                 answer = a[0]
 
+            answer = answer.replace(last_answer,"")
             print(answer, flush=True)
             yield answer.encode("utf-8")
 
@@ -341,8 +336,6 @@ async def stream_data(req: GenerateRequest):
     answer = ''
     last_answer = ''
     for a in generator:
-        size = sys.getsizeof(a)
-        print("size: {0}".format(size))
         last_answer = answer
 
         if isinstance(a, str):
