@@ -330,7 +330,8 @@ async def stream_data(req: GenerateRequest):
 
             answer = answer.replace(prompt,"")
             #answer = answer.replace(last_answer,"")
-            print(answer, flush=True)
+            print("LA: {0}".format(last_answer), flush=True)
+            print("a: {0}".format(answer), flush=True)
             yield answer.encode("utf-8")
 
     """
