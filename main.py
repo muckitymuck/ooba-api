@@ -58,7 +58,7 @@ def search_dict(dict, key):
     except ValueError:
         pass
 
-async def start_task(id_task):
+def start_task(id_task):
     global pending_tasks
     global current_task
     global time_start
@@ -69,7 +69,7 @@ async def start_task(id_task):
     print("start job: {0}".format(id_task))
 
     # generate request
-    await generate(req)
+    generate(req)
 
 
 def finish_task():
@@ -197,7 +197,7 @@ def progress(req: ProgressRequest):
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
-async def generate(req: GenerateRequest):
+def generate(req: GenerateRequest):
     print(req.prompt)
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
