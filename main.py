@@ -248,9 +248,6 @@ def generate(req: GenerateRequest):
         stopping_strings=[],
     )
 
-    return StreamingResponse(generator)
-
-    """
     answer = ''
     last_answer = ''
     for a in generator:
@@ -266,7 +263,64 @@ def generate(req: GenerateRequest):
 
     print(answer.replace(prompt,""))
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
+
+
+@app.post("/stream")
+async def stream_data(req: GenerateRequest):
     """
+    async def generate():
+        for i in range(10):
+            # Generate some data
+            data = f"Data point {i}\n"
+            # Wait for a bit between each data point
+            await asyncio.sleep(0.5)
+            # Yield the data
+            yield data.encode("utf-8")
+    """
+    print(req.prompt)
+
+    prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+### Instruction:
+{0}
+### Response:
+""".format(req.prompt)
+
+    prompt_lines = [k.strip() for k in prompt.split('\n')]
+    prompt = '\n'.join(prompt_lines)
+
+    generate_params = {
+        'max_new_tokens': req.max_new_tokens,
+        'do_sample': req.do_sample,
+        'temperature': req.temperature,
+        'top_p': req.top_p,
+        'typical_p': req.typical_p,
+        'repetition_penalty': req.repetition_penalty,
+        'encoder_repetition_penalty': req.encoder_repetition_penalty,
+        'top_k': req.top_k,
+        'min_length': req.min_length,
+        'no_repeat_ngram_size': req.no_repeat_ngram_size,
+        'num_beams': req.num_beams,
+        'penalty_alpha': req.penalty_alpha,
+        'length_penalty': req.length_penalty,
+        'early_stopping': req.early_stopping,
+        'seed': req.seed,
+        'add_bos_token': req.add_bos_token,
+        'truncation_length': req.truncation_length,
+        'custom_stopping_strings': req.custom_stopping_strings,
+        'ban_eos_token': req.ban_eos_token,
+    }
+    #print(generate_params)
+
+    #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
+    generator = generate_reply(
+        prompt,
+        generate_params,
+        eos_token=None,
+        stopping_strings=[],
+    )
+    
+    return StreamingResponse(generator)
+
 
 @app.post("/agenerate")
 async def agenerate(req: GenerateRequest):
