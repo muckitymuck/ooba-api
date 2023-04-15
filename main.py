@@ -69,7 +69,7 @@ def start_task(id_task):
     print("start job: {0}".format(id_task))
 
     # generate request
-    generate(req)
+    await generate(req)
 
 
 def finish_task():
