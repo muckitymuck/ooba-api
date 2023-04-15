@@ -158,7 +158,7 @@ def hellow_world(q: Union[str, None] = None):
 
 # call this instead of generate to join the queue.
 @app.post("/queue", response_model=ProgressResponse)
-def queue_job(req: GenerateRequest):
+async def queue_job(req: GenerateRequest):
     global current_task
     global pending_tasks
     global finished_tasks
