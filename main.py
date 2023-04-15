@@ -312,6 +312,7 @@ async def stream_data(req: GenerateRequest):
     #print(generate_params)
 
     #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
+    
     generator = generate_reply(
         prompt,
         generate_params,

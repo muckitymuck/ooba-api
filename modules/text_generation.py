@@ -152,12 +152,14 @@ def generate_reply(question, state, eos_token=None, stopping_strings=[]):
         generate_params['token_count'] = state['max_new_tokens']
         try:
             if shared.args.no_stream:
+                print("no stream")
                 reply = shared.model.generate(context=question, **generate_params)
                 output = original_question + reply
                 if not shared.is_chat():
                     reply = original_question + apply_extensions(reply, 'output')
                 yield formatted_outputs(reply, shared.model_name)
             else:
+                print("stream")
                 if not shared.is_chat():
                     yield formatted_outputs(question, shared.model_name)
 
