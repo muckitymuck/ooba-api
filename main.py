@@ -44,7 +44,7 @@ def check_queue():
     global pending_tasks
     print(pending_tasks)
     
-    if len(pending_tasks)>=1:
+    if len(pending_tasks)>=1 and current_task==-1:
         next_job = next(iter(pending_tasks))
         start_task(next_job)
         return 1
