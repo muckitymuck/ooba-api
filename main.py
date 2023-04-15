@@ -268,16 +268,6 @@ def generate(req: GenerateRequest):
 
 @app.post("/stream")
 async def stream_data(req: GenerateRequest):
-    """
-    async def generate():
-        for i in range(10):
-            # Generate some data
-            data = f"Data point {i}\n"
-            # Wait for a bit between each data point
-            await asyncio.sleep(0.5)
-            # Yield the data
-            yield data.encode("utf-8")
-    """
     print(req.prompt)
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
@@ -321,6 +311,7 @@ async def stream_data(req: GenerateRequest):
         stopping_strings=[],
     )
 
+    """
     # open generator in here and re-yield it?
     async def gen():
         for i in range(10):
@@ -330,6 +321,21 @@ async def stream_data(req: GenerateRequest):
             await asyncio.sleep(0.5)
             # Yield the data
             yield data.encode("utf-8")
+    """
+
+    async def gen():
+        for a in generator:
+            size = sys.getsizeof(a)
+            print("size: {0}".format(size))
+            last_answer = answer
+
+            if isinstance(a, str):
+                answer = a
+            else:
+                answer = a[0]
+
+            print(answer, flush=True)
+            yield answer.encode("utf-8")
 
     """
     answer = ''
