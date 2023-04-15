@@ -324,10 +324,10 @@ async def stream_data(req: GenerateRequest):
     """
 
     async def gen():
+        answer = ""
         for a in generator:
-            size = sys.getsizeof(a)
-            print("size: {0}".format(size))
-            last_answer = answer
+            #size = sys.getsizeof(a)
+            #print("size: {0}".format(size))
 
             if isinstance(a, str):
                 answer = a
