@@ -325,7 +325,7 @@ async def stream_data(req: GenerateRequest):
         answer_str = ""
         last_answer = ""
         for a in generator:
-            print("LA: {0}".format(_len), flush=True)
+            #print("LA: {0}".format(_len), flush=True)
             
             if isinstance(a, str):
                 answer = a
@@ -336,8 +336,9 @@ async def stream_data(req: GenerateRequest):
             answer = answer.replace(prompt,"")
             # remove last part of the stream from response:
             #answer = answer[_len:]
+            cut = answer[_len:]
             #answer = answer.replace(last_answer,"")
-            print("a: {0}".format(answer[_len:]), flush=True)
+            print("a: {0}".format(cut), flush=True)
             last_answer = answer
             _len = len(last_answer)
             yield answer.encode("utf-8")
