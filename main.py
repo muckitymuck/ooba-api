@@ -215,6 +215,8 @@ def progress(req: ProgressRequest):
 @app.post("/chat/generate")
 async def fw(req: GenerateRequest):
 
+    import requests
+
     # move everything into an async function..
     # return it as a return stream?
     
