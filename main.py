@@ -307,7 +307,10 @@ async def stream_data(req: GenerateRequest):
     #print(generate_params)
 
     # Hooking no_stream arg so that we can set streaming value from here:
-    if req.streaming==False:
+    if req.streaming:
+        print("strem")
+        shared.args.no_stream = False
+    else:
         print("no_strem")
         shared.args.no_stream = True
     
