@@ -213,7 +213,7 @@ def progress(req: ProgressRequest):
 
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
-@app.post("/agenerate")
+@app.post("/generate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
     print("streaming?: {0}".format(req.streaming))
