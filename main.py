@@ -259,21 +259,19 @@ async def stream_data(req: GenerateRequest):
     else:
         shared.args.no_stream = True
 
+    # If in queue and not processing, start a different stream?
+    # yield from queue. /queue should return stream
+    # ...
+    
+    # start generating response:
+    generator = generate_reply(
+        prompt, #question
+        generate_params, #state
+        eos_token=None,
+        stopping_strings=[],
+    )
+
     async def gen():
-
-        # If in queue and not processing, start a different stream?
-        # yield from queue. /queue should return stream
-        #while len(pending_tasks)>=1:
-        #    yield "Queue"
-
-        # start generating response:
-        generator = generate_reply(
-            prompt, #question
-            generate_params, #state
-            eos_token=None,
-            stopping_strings=[],
-        )
-
         _len = 0
         answer = ""
         answer_str = ""
