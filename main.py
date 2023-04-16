@@ -318,8 +318,6 @@ async def stream_data(req: GenerateRequest):
         # yield from queue. /queue should return stream
         # ...
 
-        _start = 0
-        _stop = 0
         _len = 0
         answer = ""
         answer_str = ""
@@ -332,9 +330,12 @@ async def stream_data(req: GenerateRequest):
             else:
                 answer = a[0]
 
+            # remove prompt from response:
             answer = answer.replace(prompt,"")
-            #answer = answer.replace(last_answer,"")
-            print("a: {0}".format(answer[_len:]), flush=True)
+            # remove last part of the stream from response:
+            answer = answer[_len:]
+
+            # set next last_answer
             last_answer = answer
             _len = len(last_answer)
             yield answer.encode("utf-8")
