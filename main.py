@@ -266,7 +266,7 @@ def generate(req: GenerateRequest):
     return {"wintermute": "ai", "response": answer.replace(prompt,"")}
 
 
-@app.post("/stream")
+@app.post("/agenerate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
 
@@ -318,15 +318,11 @@ async def stream_data(req: GenerateRequest):
         # yield from queue. /queue should return stream
         # ...
 
-        _start = 0
-        _stop = 0
         _len = 0
         answer = ""
         answer_str = ""
         last_answer = ""
         for a in generator:
-            #print("LA: {0}".format(_len), flush=True)
-            
             if isinstance(a, str):
                 answer = a
             else:
@@ -334,36 +330,19 @@ async def stream_data(req: GenerateRequest):
 
             # remove prompt from response:
             answer = answer.replace(prompt,"")
+
             # remove last part of the stream from response:
-            #answer = answer[_len:]
             _answ = answer[_len:]
-            #answer = answer.replace(last_answer,"")
-            print("a: {0}".format(_answ), flush=True)
+            #print("a: {0}".format(_answ), flush=True)
+
+            # set next last_answer:
             last_answer = answer
             _len = len(last_answer)
+
             yield _answ.encode("utf-8")
 
-    """
-    answer = ''
-    last_answer = ''
-    for a in generator:
-        last_answer = answer
-
-        if isinstance(a, str):
-            answer = a
-        else:
-            answer = a[0]
-
-        print(answer, flush=True)
-    """
-
     return StreamingResponse(gen())
-    #return StreamingResponse(generator)
 
-
-@app.post("/agenerate")
-async def agenerate(req: GenerateRequest):
-    print("stream.")
 
 @app.get("/check")
 def check():
