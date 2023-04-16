@@ -43,6 +43,7 @@ def _threaded_queue_callback():
     
 
 def check_queue():
+    global current_task
     global pending_tasks
     print(pending_tasks)
     
@@ -150,6 +151,7 @@ class GenerateRequest(BaseModel):
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
     streaming: Optional[bool] =True
+    # task_id?
 
 
 def add_task_to_queue(req: GenerateRequest):
@@ -256,20 +258,21 @@ async def stream_data(req: GenerateRequest):
         shared.args.no_stream = False
     else:
         shared.args.no_stream = True
-    
-    # start generating response:
-    generator = generate_reply(
-        prompt, #question
-        generate_params, #state
-        eos_token=None,
-        stopping_strings=[],
-    )
 
     async def gen():
 
         # If in queue and not processing, start a different stream?
         # yield from queue. /queue should return stream
-        # ...
+        #while len(pending_tasks)>=1:
+        #    yield "Queue"
+
+        # start generating response:
+        generator = generate_reply(
+            prompt, #question
+            generate_params, #state
+            eos_token=None,
+            stopping_strings=[],
+        )
 
         _len = 0
         answer = ""
