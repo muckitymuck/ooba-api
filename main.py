@@ -19,6 +19,7 @@ from fastapi import FastAPI, Request
 from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
 #clean up imports,lol
+from sse_starlette.sse import EventSourceResponse
 from fastapi.responses import StreamingResponse
 import asyncio
 import io
@@ -297,6 +298,7 @@ async def stream_data(req: GenerateRequest):
         # finish task in queue
         #finish_task()
 
+    return EventSourceResponse(gen(), media_type='text/event-stream')
     return StreamingResponse(gen())
 
 
