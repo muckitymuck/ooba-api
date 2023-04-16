@@ -11,18 +11,18 @@ from modules.models import load_model
 from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
 from modules.text_generation import encode, generate_reply, stop_everything_event
-
+#clean up imports,lol
 import uvicorn
 from typing import Union
 from pydantic import BaseModel, Field
 from fastapi import FastAPI, Request
 from typing import Any, Dict, Optional
 from fastapi.middleware.cors import CORSMiddleware
-#from sse_starlette.sse import EventSourceResponse
-
+#clean up imports,lol
 from fastapi.responses import StreamingResponse
 import asyncio
 import io
+
 
 # Tracking global variables here instead of shared:
 task_id = 0
@@ -30,9 +30,11 @@ current_task = -1
 pending_tasks = {}
 finished_tasks = []
 
+
 def start_new_thread(callback_function):
     new_thread = threading.Thread(target=callback_function)
     new_thread.start()
+
 
 def _threaded_queue_callback():
     global pending_tasks
@@ -51,12 +53,14 @@ def check_queue():
     else:
         return 0
 
+
 def search_dict(dict, key):
     try:
         position = list(dict.keys()).index(int(key))
         return position+1
     except ValueError:
         pass
+
 
 def start_task(id_task):
     global pending_tasks
@@ -86,11 +90,13 @@ def finish_task():
     if len(finished_tasks) > 16:
         finished_tasks.pop(0)
 
+
 def get_available_models():
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)
     else:
         return sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
+
 
 # Setup FastAPI:
 app = FastAPI()
@@ -145,16 +151,16 @@ class GenerateRequest(BaseModel):
     ban_eos_token: Optional[bool] =False
     streaming: Optional[bool] =True
 
+
 def add_task_to_queue(req: GenerateRequest):
     global task_id
     global pending_tasks
 
     task_id = task_id+1
-
     pending_tasks[task_id] = req
-    #pending_tasks[task_id] = time.time()
 
     return task_id
+
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
@@ -205,69 +211,8 @@ def progress(req: ProgressRequest):
 
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
 
+
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
-@app.post("/generate")
-def generate(req: GenerateRequest):
-    print(req.prompt)
-
-    prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-### Instruction:
-{0}
-### Response:
-""".format(req.prompt)
-
-    prompt_lines = [k.strip() for k in prompt.split('\n')]
-    prompt = '\n'.join(prompt_lines)
-
-    generate_params = {
-        'max_new_tokens': req.max_new_tokens,
-        'do_sample': req.do_sample,
-        'temperature': req.temperature,
-        'top_p': req.top_p,
-        'typical_p': req.typical_p,
-        'repetition_penalty': req.repetition_penalty,
-        'encoder_repetition_penalty': req.encoder_repetition_penalty,
-        'top_k': req.top_k,
-        'min_length': req.min_length,
-        'no_repeat_ngram_size': req.no_repeat_ngram_size,
-        'num_beams': req.num_beams,
-        'penalty_alpha': req.penalty_alpha,
-        'length_penalty': req.length_penalty,
-        'early_stopping': req.early_stopping,
-        'seed': req.seed,
-        'add_bos_token': req.add_bos_token,
-        'truncation_length': req.truncation_length,
-        'custom_stopping_strings': req.custom_stopping_strings,
-        'ban_eos_token': req.ban_eos_token,
-        #'streaming': req.streaming
-    }
-    #print(generate_params)
-
-    #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
-    generator = generate_reply(
-        prompt,
-        generate_params,
-        eos_token=None,
-        stopping_strings=[],
-    )
-
-    answer = ''
-    last_answer = ''
-    for a in generator:
-        last_answer = answer
-
-        if isinstance(a, str):
-            answer = a
-        else:
-            answer = a[0]
-
-    # finish task in queue
-    finish_task()
-
-    print(answer.replace(prompt,""))
-    return {"wintermute": "ai", "response": answer.replace(prompt,"")}
-
-
 @app.post("/agenerate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
@@ -394,8 +339,8 @@ if __name__ == "__main__":
         if shared.args.lora:
             add_lora_to_model([shared.args.lora])
 
-    #python main.py --model_type llama --wbits 4 --groupsize 128 --xformers
-    #python main.py --model_type llama --load-in-8bit --lora baize-lora-13B --xformers
+    #python main.py --model-menu --model_type llama --wbits 4 --groupsize 128 --xformers
+    #python main.py --model-menu --model_type llama --load-in-8bit --lora baize-lora-13B --xformers
     
     uvicorn.run(
         app,
