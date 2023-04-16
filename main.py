@@ -143,6 +143,7 @@ class GenerateRequest(BaseModel):
     truncation_length: Optional[int] = 2048
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
+    streaming: Optional[bool] =True
 
 def add_task_to_queue(req: GenerateRequest):
     global task_id
@@ -238,7 +239,7 @@ def generate(req: GenerateRequest):
         'truncation_length': req.truncation_length,
         'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
-        'streaming': True
+        #'streaming': req.streaming
     }
     #print(generate_params)
 
@@ -301,6 +302,7 @@ async def stream_data(req: GenerateRequest):
         'truncation_length': req.truncation_length,
         'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
+        'streaming': req.streaming
     }
     #print(generate_params)
 
