@@ -238,6 +238,7 @@ def generate(req: GenerateRequest):
         'truncation_length': req.truncation_length,
         'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
+        'streaming': True
     }
     #print(generate_params)
 
@@ -269,6 +270,7 @@ def generate(req: GenerateRequest):
 @app.post("/agenerate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
+    print("streaming?: {0}".format(req.streaming))
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
@@ -302,12 +304,15 @@ async def stream_data(req: GenerateRequest):
     }
     #print(generate_params)
 
-    #def generate_reply(question, state, eos_token=None, stopping_strings=[]):
+    # Hooking no_stream arg so that we can set streaming value from here:
+    if req.streaming==False:
+        print("no_strem")
+        shared.args.no_stream = True
     
     # start generating response:
     generator = generate_reply(
-        prompt,
-        generate_params,
+        prompt, #question
+        generate_params, #state
         eos_token=None,
         stopping_strings=[],
     )
@@ -340,6 +345,9 @@ async def stream_data(req: GenerateRequest):
             _len = len(last_answer)
 
             yield _answ.encode("utf-8")
+
+        # finish task in queue
+        #finish_task()
 
     return StreamingResponse(gen())
 
