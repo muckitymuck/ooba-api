@@ -212,11 +212,38 @@ def progress(req: ProgressRequest):
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
 
 
+@app.post("/chat/generate")
+async def fw(req: GenerateRequest):
+
+    # move everything into an async function..
+    # return it as a return stream?
+    
+    async def gen():
+        req_params = {
+            'prompt': req.prompt,
+            'max_new_tokens': req.max_new_tokens,
+            'temperature': req.temperature,
+            'streaming': req.streaming
+        }
+        print(req.prompt)
+
+        r = requests.post("http://localhost:7861/generate", data=json.dumps(req_params), stream=True)
+
+        # try to re-yield this and stream it back:
+        if r.status_code==200:
+            for chunk in r.iter_content(chunk_size=64):
+                if chunk:
+                    print(chunk.decode("utf-8"), flush=True)
+                    yield chunk.decode("utf-8")
+
+    return StreamingResponse(gen())
+
+
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
-    print("streaming?: {0}".format(req.streaming))
+    #print("streaming?: {0}".format(req.streaming))
 
     prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
@@ -253,10 +280,8 @@ async def stream_data(req: GenerateRequest):
 
     # Hooking no_stream arg so that we can set streaming value from here:
     if req.streaming:
-        print("strem")
         shared.args.no_stream = False
     else:
-        print("no_strem")
         shared.args.no_stream = True
     
     # start generating response:
