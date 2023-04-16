@@ -336,12 +336,12 @@ async def stream_data(req: GenerateRequest):
             answer = answer.replace(prompt,"")
             # remove last part of the stream from response:
             #answer = answer[_len:]
-            cut = answer[_len:]
+            _answ = answer[_len:]
             #answer = answer.replace(last_answer,"")
-            print("a: {0}".format(cut), flush=True)
+            print("a: {0}".format(_answ), flush=True)
             last_answer = answer
             _len = len(last_answer)
-            yield answer.encode("utf-8")
+            yield _answ.encode("utf-8")
 
     """
     answer = ''
