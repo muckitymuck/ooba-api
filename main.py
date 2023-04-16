@@ -334,6 +334,7 @@ async def stream_data(req: GenerateRequest):
             answer = answer.replace(prompt,"")
             # remove last part of the stream from response:
             answer = answer[_len:]
+            print(answer)
 
             # set next last_answer
             last_answer = answer
