@@ -220,11 +220,17 @@ async def stream_data(req: GenerateRequest):
     print(req.prompt)
     #print("streaming?: {0}".format(req.streaming))
 
-    prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+    #prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
-{0}
+#{0}
 ### Response:
-""".format(req.prompt)
+#""".format(req.prompt)
+
+    # homer prompt:
+    prompt = """Below is a script from the American animated sitcom The Simpsons. Write response that completes Homer Simpson's last line in the conversation.
+
+{0}
+Homer Simpson:""".format(req.prompt)
 
     prompt_lines = [k.strip() for k in prompt.split('\n')]
     prompt = '\n'.join(prompt_lines)
