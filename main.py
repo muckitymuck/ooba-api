@@ -215,6 +215,33 @@ def progress(req: ProgressRequest):
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
 
 
+@router.post("/wintermute.in/chat/generate")
+async def generate(req: GenerateRequest):
+    print(req.prompt)
+
+    req_params = {
+        'prompt': req.prompt,
+        'max_new_tokens': req.max_new_tokens,
+        'temperature': req.temperature,
+        'streaming': req.streaming
+    }
+
+    # send request to inference:
+    try:
+        r = requests.post("http://localhost:7861/generate", data=json.dumps(req_params), stream=True)
+    
+        # re-yield this and stream it back:
+        async def gen():
+            for chunk in r.iter_content(chunk_size=64):
+                if chunk:
+                    yield chunk.decode("utf-8")
+                    print(chunk.decode("utf-8"), flush=True)
+
+        return StreamingResponse(gen(), media_type='text/event-stream')
+    except:
+        async def gen():
+            yield "Error"
+
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
