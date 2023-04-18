@@ -216,7 +216,9 @@ def progress(req: ProgressRequest):
 
 #This is our api endpoint. When a client subscribes to this endpoint, they will receive SSE from our log file
 @app.get('/stream-logs')
-async def run(request: Request, req: GenerateRequest):
+async def run(request: Request):
+    req = GenerateRequest()
+    req.prompt = "devil shit"
     #event_generator = logGenerator(request)
     return EventSourceResponse(stream_data(req))
 
