@@ -150,6 +150,7 @@ class GenerateRequest(BaseModel):
     truncation_length: Optional[int] = 2048
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
+    skip_special_tokens: Optional[bool] =False
     streaming: Optional[bool] =True
     # task_id?
 
@@ -255,6 +256,7 @@ Homer Simpson:""".format(req.prompt)
         'truncation_length': req.truncation_length,
         'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
+        'skip_special_tokens': req.skip_special_tokens
         'streaming': req.streaming
     }
     #print(generate_params)
