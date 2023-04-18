@@ -215,7 +215,7 @@ def progress(req: ProgressRequest):
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
 
 
-@app.post("/wintermute.in/chat/generate")
+@app.post("/chat/generate")
 async def generate(req: GenerateRequest):
     print(req.prompt)
 
