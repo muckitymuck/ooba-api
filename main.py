@@ -219,6 +219,7 @@ def progress(req: ProgressRequest):
 async def run(request: Request):
     req = GenerateRequest()
     req.prompt = "devil shit"
+    print(req.prompt)
     #event_generator = logGenerator(request)
     return EventSourceResponse(stream_data(req))
 
