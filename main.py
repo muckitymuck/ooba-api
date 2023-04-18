@@ -256,7 +256,7 @@ Homer Simpson:""".format(req.prompt)
         'truncation_length': req.truncation_length,
         'custom_stopping_strings': req.custom_stopping_strings,
         'ban_eos_token': req.ban_eos_token,
-        'skip_special_tokens': req.skip_special_tokens
+        'skip_special_tokens': req.skip_special_tokens,
         'streaming': req.streaming
     }
     #print(generate_params)
