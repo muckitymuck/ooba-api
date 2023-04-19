@@ -26,6 +26,7 @@ def get_available_models():
 
 # Setup FastAPI:
 app = FastAPI()
+semaphore = asyncio.Semaphore(1)
 
 app.add_middleware(
     CORSMiddleware,
@@ -74,6 +75,16 @@ def hellow_world(q: Union[str, None] = None):
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
+    #'''
+    while True:
+        try:
+            # Attempt to acquire the semaphore without waiting
+            await asyncio.wait_for(semaphore.acquire(), timeout=0.1)
+            break
+        except asyncio.TimeoutError:
+            print("Server is busy")
+            #raise HTTPException(status_code=503, detail="Server is busy, please try again later")
+    #'''
     print(req.prompt)
   
     prompt_lines = [k.strip() for k in req.prompt.split('\n')]
@@ -110,6 +121,7 @@ async def stream_data(req: GenerateRequest):
     else:
         shared.args.no_stream = True
 
+    # Set custom stopping strings from req.
     if req.custom_stopping_strings!="":
         stop = [req.custom_stopping_strings]
     else:
