@@ -25,74 +25,6 @@ import asyncio
 import io
 
 
-# Tracking global variables here instead of shared:
-task_id = 0
-current_task = -1
-pending_tasks = {}
-finished_tasks = []
-
-
-def start_new_thread(callback_function):
-    new_thread = threading.Thread(target=callback_function)
-    new_thread.start()
-
-
-def _threaded_queue_callback():
-    global pending_tasks
-    print("callback")
-    check_queue()
-    
-
-def check_queue():
-    global current_task
-    global pending_tasks
-    print(pending_tasks)
-    
-    if len(pending_tasks)>=1 and current_task==-1:
-        next_job = next(iter(pending_tasks))
-        start_task(next_job)
-        return 1
-    else:
-        return 0
-
-
-def search_dict(dict, key):
-    try:
-        position = list(dict.keys()).index(int(key))
-        return position+1
-    except ValueError:
-        pass
-
-
-def start_task(id_task):
-    global pending_tasks
-    global current_task
-    global time_start
-
-    time_start = time.time()
-    current_task = id_task
-    req = pending_tasks.pop(id_task, None)
-    print("start job: {0}".format(id_task))
-
-    # generate request
-    generate(req)
-
-
-def finish_task():
-    global current_task
-    global finished_tasks
-
-    finished_tasks.append(current_task)
-    print("task finished: {0}".format(current_task))
-    current_task = -1
-
-    # check queue for any more tasks:
-    check_queue()
-
-    if len(finished_tasks) > 16:
-        finished_tasks.pop(0)
-
-
 def get_available_models():
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)
@@ -110,20 +42,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class ProgressRequest(BaseModel):
-    id_task: str = Field(default=None, title="Task ID", description="id of the task to get progress for")
-
-
-class ProgressResponse(BaseModel):
-    active: bool = Field(title="Whether the task is being worked on right now")
-    queued: bool = Field(title="Whether the task is in queue")
-    completed: bool = Field(title="Whether the task has already finished")
-    #position in queue
-    progress: str = Field(default=None, title="Progress", description="The number of messages in the queue")
-    eta: float = Field(default=None, title="ETA in secs")
-    textinfo: str = Field(default=None, title="Info text", description="Info text used by WebUI.")
 
 
 class GenerateRequest(BaseModel):
@@ -156,61 +74,15 @@ class GenerateRequest(BaseModel):
     # task_id?
 
 
-def add_task_to_queue(req: GenerateRequest):
-    global task_id
-    global pending_tasks
-
-    task_id = task_id+1
-    pending_tasks[task_id] = req
-
-    return task_id
-
-
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
     return {"wintermute": "ai", "q": q}
-
-
-# call this instead of generate to join the queue.
-@app.post("/queue", response_model=ProgressResponse)
-def queue_job(req: GenerateRequest):
-    global current_task
-    global pending_tasks
-    global finished_tasks
-
-    # add to queue:
-    task_id = add_task_to_queue(req)
-    print("queue task: {0}".format(task_id))
-
-    position = search_dict(pending_tasks, task_id)
-    active = int(task_id) == int(current_task)
-    queued = int(task_id) in pending_tasks
-    completed = int(task_id) in finished_tasks
-
-
-    # Queue has to recognize when we are the only person in queue and just start streaming, 
-    # and don't callback.     This should be an else to that:
-
-    # callback to handle pending tasks
-    start_new_thread(_threaded_queue_callback)
-
-    # Maybe instead of starting a thread, we should just wait await a generate() here?
-
-    return ProgressResponse(active=active, queued=queued, completed=completed, progress="({0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
-
 
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
     print(req.prompt)
-    #print("streaming?: {0}".format(req.streaming))
-
-    #prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-### Instruction:
-#{0}
-### Response:
-#""".format(req.prompt)
   
     prompt_lines = [k.strip() for k in prompt.split('\n')]
     prompt = '\n'.join(prompt_lines)
@@ -282,9 +154,6 @@ async def stream_data(req: GenerateRequest):
             _len = len(last_answer)
 
             yield _answ.encode("utf-8")
-
-        # finish task in queue
-        #finish_task()
 
     return StreamingResponse(gen())
 
