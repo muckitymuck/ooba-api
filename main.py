@@ -154,7 +154,7 @@ async def stream_data(req: GenerateRequest):
 
                 # remove last part of the stream from response:
                 _answ = answer[_len:]
-                #print("a: {0}".format(_answ), flush=True)
+                print("a: {0}".format(_answ), flush=True)
 
                 # set next last_answer:
                 last_answer = answer
