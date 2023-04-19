@@ -215,13 +215,6 @@ def progress(req: ProgressRequest):
 
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
 
-#This is our api endpoint. When a client subscribes to this endpoint, they will receive SSE from our log file
-@app.get('/stream-logs')
-async def run(request: Request):
-    req = GenerateRequest(prompt = "devil shit")
-    print(req.prompt)
-    #event_generator = logGenerator(request)
-    return EventSourceResponse(stream_data(req))
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
@@ -278,13 +271,18 @@ Homer Simpson:""".format(req.prompt)
     # If in queue and not processing, start a different stream?
     # yield from queue. /queue should return stream
     # ...
+
+    if req.custom_stopping_strings!="":
+        d = [req.custom_stopping_strings]
+    else:
+        d = []
     
     # start generating response:
     generator = generate_reply(
         prompt, #question
         generate_params, #state
         eos_token=None,
-        stopping_strings=[],
+        stopping_strings=d, #
     )
 
     async def gen():
