@@ -83,6 +83,7 @@ async def stream_data(req: GenerateRequest):
             break
         except asyncio.TimeoutError:
             print("Server is busy")
+            await asyncio.sleep(1)
             #raise HTTPException(status_code=503, detail="Server is busy, please try again later")
     #'''
     print(req.prompt)
