@@ -199,22 +199,6 @@ def queue_job(req: GenerateRequest):
     return ProgressResponse(active=active, queued=queued, completed=completed, progress="({0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
 
 
-@app.post("/internal/progress", response_model=ProgressResponse)
-def progress(req: ProgressRequest):
-    global current_task
-    global pending_tasks
-    global finished_tasks
-
-    position = search_dict(pending_tasks, req.id_task)
-    active = int(req.id_task) == int(current_task)
-    queued = int(req.id_task) in pending_tasks
-    completed = int(req.id_task) in finished_tasks
-    
-    if not active:
-        return ProgressResponse(active=active, queued=queued, completed=completed, progress="(pos {0} out of {1})".format(position,len(pending_tasks)), textinfo="In queue..." if queued else "Waiting...")
-
-    return ProgressResponse(active=active, queued=queued, completed=completed, progress="{0}".format(1), textinfo="currently processing")
-
 
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
@@ -227,12 +211,12 @@ async def stream_data(req: GenerateRequest):
 #{0}
 ### Response:
 #""".format(req.prompt)
-
-    # homer prompt:
-    prompt = """Below is a script from the American animated sitcom The Simpsons. Write response that completes Homer Simpson's last line in the conversation.
-
-{0}
-Homer Simpson:""".format(req.prompt)
+  
+    # homer prompt: (Move prompting client side.. we can fall back to alpaca prompting as default)
+    prompt = """Below is a script from the American animated sitcom The Simpsons. Write response that completes {0}'s last line in the conversation.
+{1}
+{2}
+{0}:""".format("Homer Simpson", "Marge Simpson:What do you want for breakfast Homie?\nHomer Simpson: I'm so hungry I could eat a horse!", req.prompt)
 
     prompt_lines = [k.strip() for k in prompt.split('\n')]
     prompt = '\n'.join(prompt_lines)
@@ -268,21 +252,17 @@ Homer Simpson:""".format(req.prompt)
     else:
         shared.args.no_stream = True
 
-    # If in queue and not processing, start a different stream?
-    # yield from queue. /queue should return stream
-    # ...
-
     if req.custom_stopping_strings!="":
-        d = [req.custom_stopping_strings]
+        stop = [req.custom_stopping_strings]
     else:
-        d = []
+        stop = []
     
     # start generating response:
     generator = generate_reply(
         prompt, #question
         generate_params, #state
         eos_token=None,
-        stopping_strings=d, #
+        stopping_strings= stop,
     )
 
     async def gen():
