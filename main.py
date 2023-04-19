@@ -125,7 +125,7 @@ async def stream_data(req: GenerateRequest):
     
     # start generating response:
     generator = generate_reply(
-        prompt, #question
+        req.prompt, #question
         generate_params, #state
         eos_token=None,
         stopping_strings= stop,
