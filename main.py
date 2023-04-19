@@ -1,28 +1,20 @@
 import re
 import sys
-import json
-import time
-import torch
-import threading
-import transformers
+import asyncio
+import uvicorn
+from typing import Union
 from pathlib import Path
 from modules import shared
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Any, Dict, Optional
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+# Ooba imports:
 from modules.models import load_model
 from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
 from modules.text_generation import encode, generate_reply, stop_everything_event
-#clean up imports,lol
-import uvicorn
-from typing import Union
-from pydantic import BaseModel, Field
-from fastapi import FastAPI, Request
-from typing import Any, Dict, Optional
-from fastapi.middleware.cors import CORSMiddleware
-#clean up imports,lol
-from sse_starlette.sse import EventSourceResponse
-from fastapi.responses import StreamingResponse
-import asyncio
-import io
 
 
 def get_available_models():
