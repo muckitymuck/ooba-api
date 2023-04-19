@@ -86,81 +86,88 @@ async def stream_data(req: GenerateRequest):
             await asyncio.sleep(1)
             #raise HTTPException(status_code=503, detail="Server is busy, please try again later")
     #'''
-    print(req.prompt)
+
+    try:
+        print(req.prompt)
   
-    prompt_lines = [k.strip() for k in req.prompt.split('\n')]
-    req.prompt = '\n'.join(prompt_lines)
+        prompt_lines = [k.strip() for k in req.prompt.split('\n')]
+        req.prompt = '\n'.join(prompt_lines)
 
-    generate_params = {
-        'max_new_tokens': req.max_new_tokens,
-        'do_sample': req.do_sample,
-        'temperature': req.temperature,
-        'top_p': req.top_p,
-        'typical_p': req.typical_p,
-        'repetition_penalty': req.repetition_penalty,
-        'encoder_repetition_penalty': req.encoder_repetition_penalty,
-        'top_k': req.top_k,
-        'min_length': req.min_length,
-        'no_repeat_ngram_size': req.no_repeat_ngram_size,
-        'num_beams': req.num_beams,
-        'penalty_alpha': req.penalty_alpha,
-        'length_penalty': req.length_penalty,
-        'early_stopping': req.early_stopping,
-        'seed': req.seed,
-        'add_bos_token': req.add_bos_token,
-        'truncation_length': req.truncation_length,
-        'custom_stopping_strings': req.custom_stopping_strings,
-        'ban_eos_token': req.ban_eos_token,
-        'skip_special_tokens': req.skip_special_tokens,
-        'streaming': req.streaming
-    }
-    #print(generate_params)
+        generate_params = {
+            'max_new_tokens': req.max_new_tokens,
+            'do_sample': req.do_sample,
+            'temperature': req.temperature,
+            'top_p': req.top_p,
+            'typical_p': req.typical_p,
+            'repetition_penalty': req.repetition_penalty,
+            'encoder_repetition_penalty': req.encoder_repetition_penalty,
+            'top_k': req.top_k,
+            'min_length': req.min_length,
+            'no_repeat_ngram_size': req.no_repeat_ngram_size,
+            'num_beams': req.num_beams,
+            'penalty_alpha': req.penalty_alpha,
+            'length_penalty': req.length_penalty,
+            'early_stopping': req.early_stopping,
+            'seed': req.seed,
+            'add_bos_token': req.add_bos_token,
+            'truncation_length': req.truncation_length,
+            'custom_stopping_strings': req.custom_stopping_strings,
+            'ban_eos_token': req.ban_eos_token,
+            'skip_special_tokens': req.skip_special_tokens,
+            'streaming': req.streaming
+        }
+        #print(generate_params)
 
-    # Hooking no_stream arg so that we can set streaming value from here:
-    if req.streaming:
-        shared.args.no_stream = False
-    else:
-        shared.args.no_stream = True
+        # Hooking no_stream arg so that we can set streaming value from here:
+        if req.streaming:
+            shared.args.no_stream = False
+        else:
+            shared.args.no_stream = True
 
-    # Set custom stopping strings from req.
-    if req.custom_stopping_strings!="":
-        stop = [req.custom_stopping_strings]
-    else:
-        stop = []
+        # Set custom stopping strings from req.
+        if req.custom_stopping_strings!="":
+            stop = [req.custom_stopping_strings]
+        else:
+            stop = []
     
-    # start generating response:
-    generator = generate_reply(
-        req.prompt, #question
-        generate_params, #state
-        eos_token=None,
-        stopping_strings= stop,
-    )
+        # start generating response:
+        generator = generate_reply(
+            req.prompt, #question
+            generate_params, #state
+            eos_token=None,
+            stopping_strings= stop,
+        )
 
-    async def gen():
-        _len = 0
-        answer = ""
-        answer_str = ""
-        last_answer = ""
-        for a in generator:
-            if isinstance(a, str):
-                answer = a
-            else:
-                answer = a[0]
+        async def gen():
+            _len = 0
+            answer = ""
+            answer_str = ""
+            last_answer = ""
+            for a in generator:
+                if isinstance(a, str):
+                    answer = a
+                else:
+                    answer = a[0]
 
-            # remove prompt from response:
-            answer = answer.replace(req.prompt,"")
+                # remove prompt from response:
+                answer = answer.replace(req.prompt,"")
 
-            # remove last part of the stream from response:
-            _answ = answer[_len:]
-            #print("a: {0}".format(_answ), flush=True)
+                # remove last part of the stream from response:
+                _answ = answer[_len:]
+                #print("a: {0}".format(_answ), flush=True)
 
-            # set next last_answer:
-            last_answer = answer
-            _len = len(last_answer)
+                # set next last_answer:
+                last_answer = answer
+                _len = len(last_answer)
 
-            yield _answ.encode("utf-8")
+                yield _answ.encode("utf-8")
 
-    return StreamingResponse(gen())
+        return StreamingResponse(gen())
+    except Exception as e:
+        return {'response': f"Exception while processing request: {e}"}
+
+    finally:
+        semaphore.release()
 
 
 @app.get("/check")
