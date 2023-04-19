@@ -212,12 +212,6 @@ async def stream_data(req: GenerateRequest):
 ### Response:
 #""".format(req.prompt)
   
-    # homer prompt: (Move prompting client side.. we can fall back to alpaca prompting as default)
-    prompt = """Below is a script from the American animated sitcom The Simpsons. Write response that completes {0}'s last line in the conversation.
-{1}
-{2}
-{0}:""".format("Homer Simpson", "Marge Simpson:What do you want for breakfast Homie?\nHomer Simpson: I'm so hungry I could eat a horse!", req.prompt)
-
     prompt_lines = [k.strip() for k in prompt.split('\n')]
     prompt = '\n'.join(prompt_lines)
 
