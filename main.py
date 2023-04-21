@@ -72,6 +72,12 @@ def hellow_world(q: Union[str, None] = None):
     return {"wintermute": "ai", "q": q}
 
 
+# Webserver uses this to check if LLM is running:
+@app.get("/check")
+def check():
+    return shared.model_name
+
+
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
@@ -168,11 +174,6 @@ async def stream_data(req: GenerateRequest):
 
     finally:
         semaphore.release()
-
-
-@app.get("/check")
-def check():
-    return "Ok"
 
 if __name__ == "__main__":
     # get available models:
