@@ -81,7 +81,6 @@ def check():
 # in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
-    #'''
     while True:
         try:
             # Attempt to acquire the semaphore without waiting
@@ -91,7 +90,6 @@ async def stream_data(req: GenerateRequest):
             print("Server is busy")
             await asyncio.sleep(1)
             #raise HTTPException(status_code=503, detail="Server is busy, please try again later")
-    #'''
 
     try:
         print(req.prompt)
@@ -160,7 +158,7 @@ async def stream_data(req: GenerateRequest):
 
                 # remove last part of the stream from response:
                 _answ = answer[_len:]
-                print("a: {0}".format(_answ), flush=True)
+                #print("a: {0}".format(_answ), flush=True)
 
                 # set next last_answer:
                 last_answer = answer
