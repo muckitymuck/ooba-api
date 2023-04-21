@@ -75,8 +75,6 @@ def hellow_world(q: Union[str, None] = None):
 # Webserver uses this to check if LLM is running:
 @app.get("/check")
 def check():
-    print(shared.wbits)
-    print(shared.model_name)
     return shared.model_name
 
 
