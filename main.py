@@ -94,8 +94,8 @@ async def stream_data(req: GenerateRequest):
     try:
         print(req.prompt)
   
-        prompt_lines = [k.strip() for k in req.prompt.split('\n')]
-        req.prompt = '\n'.join(prompt_lines)
+        #prompt_lines = [k.strip() for k in req.prompt.split('\n')]
+        #req.prompt = '\n'.join(prompt_lines)
 
         generate_params = {
             'max_new_tokens': req.max_new_tokens,
