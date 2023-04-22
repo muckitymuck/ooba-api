@@ -14,8 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from modules.models import load_model
 from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
-from modules.text_generation import encode, generate_reply, stop_everything_event
-
+from modules.text_generation import (encode, generate_reply, stop_everything_event)
 
 def get_available_models():
     if shared.args.flexgen:
@@ -120,7 +119,7 @@ async def stream_data(req: GenerateRequest):
             'skip_special_tokens': req.skip_special_tokens,
             'streaming': req.streaming
         }
-        print(generate_params)
+        #print(generate_params)
 
         # Hooking no_stream arg so that we can set streaming value from here:
         if req.streaming:
