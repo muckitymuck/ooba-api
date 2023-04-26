@@ -2,6 +2,7 @@ import re
 import sys
 import asyncio
 import uvicorn
+import subprocess
 from typing import Union
 from pathlib import Path
 from modules import shared
@@ -171,6 +172,22 @@ async def stream_data(req: GenerateRequest):
 
     finally:
         semaphore.release()
+
+
+# do we just need model name here? shared.model_name
+# we may want to keep track of 'shared.args.wbit' from the filename so we can set this field before we change models.
+#def reload_model():
+#    unload_model()
+#    shared.model, shared.tokenizer = load_model(shared.model_name)
+
+
+# fastAPI call to get models. it can 'ls -l ~/llm_models' with subprocess and return the output
+@app.get("/get_models")
+def get_models():
+    result = subprocess.run(['ls', '-l', '/home/nap/llm_models/'], stdout=subprocess.PIPE)
+    print(result.stdout.decode('utf-8'))
+    return { "models": result.stdout.decode('utf-8') }
+
 
 if __name__ == "__main__":
     # get available models:
