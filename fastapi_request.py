@@ -67,6 +67,7 @@ def generate(message):
 
 # Here we generate the test script:
 # we can accept tuple: (models, loras) if we want to do lora later?
+# want to accept questions[] list, or file.
 def test_model(models):
     print("[test_model]:")
 
