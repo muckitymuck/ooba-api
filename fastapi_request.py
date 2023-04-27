@@ -101,7 +101,7 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("llamaOG-13B-hf")
+    test_model("vicuna-13B-1.1-4bit")
     #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
 
     # test with / without:
