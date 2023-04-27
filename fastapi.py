@@ -8,20 +8,39 @@ from pathlib import Path
 from modules import shared
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Ooba imports:
-from modules.models import load_model
 from modules.LoRA import add_lora_to_model
 from modules.models import clear_torch_cache
+from modules.models import load_model, unload_model
 from modules.text_generation import (encode, generate_reply, stop_everything_event)
+
+
+# [ RENAME: FASTAPI.py ]
+
 
 def get_available_models():
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)
     else:
         return sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
+
+
+def get_available_loras():
+    result = subprocess.run(['ls', '-l', '/home/nap/Documents/llm-api/loras/'], stdout=subprocess.PIPE)
+    output = result.stdout.decode('utf-8')
+
+    # split the output string by newline character
+    lines = output.split('\n')
+
+    # extract the filenames from each line
+    filenames = [line.split()[-1] for line in lines if line.strip()]
+    filenames.remove("place-your-loras-here.txt")
+
+    print(filenames)
+    return sorted(filenames[1:])
 
 
 # Setup FastAPI:
@@ -54,17 +73,14 @@ class GenerateRequest(BaseModel):
     length_penalty: Optional[float] = 1 #int
     early_stopping: Optional[bool] = False
     seed: Optional[int] = -1
-    #n: Optional[int] = None
     stream: Optional[bool] = False
     return_prompt: Optional[bool] = False
-    #stop: Optional[str] = None
     add_bos_token: Optional[bool] = True
     truncation_length: Optional[int] = 2048
     custom_stopping_strings: Optional[str] = ''
     ban_eos_token: Optional[bool] =False
     skip_special_tokens: Optional[bool] =False
     streaming: Optional[bool] =True
-    # task_id?
 
 
 @app.get("/")
@@ -89,13 +105,9 @@ async def stream_data(req: GenerateRequest):
         except asyncio.TimeoutError:
             print("Server is busy")
             await asyncio.sleep(1)
-            #raise HTTPException(status_code=503, detail="Server is busy, please try again later")
 
     try:
         print(req.prompt)
-  
-        #prompt_lines = [k.strip() for k in req.prompt.split('\n')]
-        #req.prompt = '\n'.join(prompt_lines)
 
         generate_params = {
             'max_new_tokens': req.max_new_tokens,
@@ -173,36 +185,77 @@ async def stream_data(req: GenerateRequest):
     finally:
         semaphore.release()
 
-
-# fastAPI call to get models. it can 'ls -l ~/llm_models' with subprocess and return the output
-@app.get("/get_models")
+# get models:
+@app.get("/loras")
 def get_models():
-    # return the models in my llm_models folder:
-    result = subprocess.run(['ls', '-l', '/home/nap/llm_models/'], stdout=subprocess.PIPE)
-    output = result.stdout.decode('utf-8')
-    lines = output.split('\n')
+    available_loras = get_available_loras()
 
-    # extract the filenames from each line
-    filenames = [line.split()[-1] for line in lines if line.strip()]
-    filenames = filenames[1:]
-    #print(filenames)
-
-    return { "models": filenames}
+    return { "current": shared.lora_names, "loras": available_loras }
 
 
-#@app.post("/models")
+class LoraRequest(BaseModel):
+    lora_names: List[str]
+
+
+# set lora:
+@app.post("/loras")
+def set_loras(req: LoraRequest):
+    # validation check to see if they are valid loras? Does ooba Validation check? if so we can let it fall through!
+    try:
+        add_lora_to_model(req.lora_names)
+        return { "lora": shared.lora_names } 
+    except Exception as e:
+        err_str = str(e)
+
+        if "mismatch" in err_str:
+            return { "err": "Parameter mis-match beteween lora and model." }
+        else:
+            return { "err": str(e) }
+
+
+# clear loras:
+#@app.get("/clear_loras")
+#def clear_loras():
+#    add_lora_to_model([])
+#    return { "lora": shared.lora_names } 
+
+
+# get models:
 @app.get("/models")
-def set_model():
-    print("booyah")
-    print(shared.model_name)
-    print(shared.wbits) # maybe i can normalize the names so we can let ooba guess how to run it. we should test with show-models
-    # ^ might need to manually set these so ooba is set correctly.
+def get_models():
+    available_models = get_available_models()
+    available_models.remove("config.yaml")
 
-    # do we just need model name here? shared.model_name
-    # we may want to keep track of 'shared.args.wbit' from the filename so we can set this field before we change models.
-    #def reload_model():
-    #    unload_model()
-    #    shared.model, shared.tokenizer = load_model(shared.model_name)
+    return { "current": shared.model_name, "models": available_models }
+
+class ModelRequest(BaseModel):
+    model: str
+
+# set model:
+@app.post("/models")
+def set_model(req: ModelRequest):
+
+    available_models = get_available_models()
+    if model in available_models:
+        print("loading new model")
+        unload_model()
+
+        # Set up new model, change wbits, etc:
+        shared.model_name = req.model
+        shared.model, shared.tokenizer = load_model(shared.model_name)
+        # set model name
+        # set model type?
+        # set model wbits?
+        # set model groupsize?
+
+        return { "model": shared.model_name } #(shared.model_name, shared.wbits) 
+    else:
+        models_str = ", ".join(available_models)
+        return { "err": "model not in list: [{0}] {1}".format(models_str, model) }
+
+    print(model)
+    # maybe i can normalize the names so we can let ooba guess how to run it. we should test with show-models
+    # ^ might need to manually set these so ooba is set correctly.
 
 
 if __name__ == "__main__":
