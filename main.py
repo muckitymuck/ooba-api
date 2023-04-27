@@ -185,8 +185,16 @@ async def stream_data(req: GenerateRequest):
 @app.get("/get_models")
 def get_models():
     result = subprocess.run(['ls', '-l', '/home/nap/llm_models/'], stdout=subprocess.PIPE)
-    print(result.stdout.decode('utf-8'))
-    return { "models": result.stdout.decode('utf-8') }
+    output = result.stdout.decode('utf-8')
+
+    # split the output string by newline character
+    lines = output.split('\n')
+
+    # extract the filenames from each line
+    filenames = [line.split()[-1] for line in lines if line.strip()]
+
+    print(filenames)
+    return { "models": filenames }
 
 
 if __name__ == "__main__":
