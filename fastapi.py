@@ -18,9 +18,6 @@ from modules.models import load_model, unload_model
 from modules.text_generation import (encode, generate_reply, stop_everything_event)
 
 
-# [ RENAME: FASTAPI.py ]
-
-
 def get_available_models():
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)

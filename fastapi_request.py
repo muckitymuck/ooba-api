@@ -4,9 +4,6 @@ import time
 import requests
 
 
-# [ RENAME: FASTAPI_REQUEST.py ]
-
-
 def time_function_execution(func, *args, **kwargs):
     start_time = time.time()
     func(*args, **kwargs)
@@ -103,4 +100,9 @@ if __name__ == "__main__":
     #print( get_loras() )
     #print( set_loras(["homer"]) )
 
-    test_model(["llamaOG-13B-hf", "koala-13B-HF"])
+    # Test model:
+    test_model("llamaOG-13B-hf")
+    #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
+
+    # test with / without:
+    # --quant-attn --warmup-autotune, etc
