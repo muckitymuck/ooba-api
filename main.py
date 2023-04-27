@@ -184,17 +184,17 @@ async def stream_data(req: GenerateRequest):
 # fastAPI call to get models. it can 'ls -l ~/llm_models' with subprocess and return the output
 @app.get("/get_models")
 def get_models():
+    # return the models in my llm_models folder:
     result = subprocess.run(['ls', '-l', '/home/nap/llm_models/'], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8')
-
-    # split the output string by newline character
     lines = output.split('\n')
 
     # extract the filenames from each line
     filenames = [line.split()[-1] for line in lines if line.strip()]
+    filenames = filenames[1:]
+    #print(filenames)
 
-    print(filenames)
-    return { "models": filenames }
+    return { "models": filenames}
 
 
 if __name__ == "__main__":
