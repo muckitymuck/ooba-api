@@ -100,14 +100,14 @@ if __name__ == "__main__":
 
     # Get, Set modals:
     #print( get_models() )
-    #print( set_model("llamaOG-13B-hf") )
+    print( set_model("llamaOG-13B-hf") )
 
     # Get, Set text:
     #print( get_loras() )
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("vicuna-13B-1.1-4bit")
+    #test_model("vicuna-13B-1.1-4bit")
     #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
 
     # test with / without:

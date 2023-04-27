@@ -234,16 +234,19 @@ def set_model(req: ModelRequest):
 
     available_models = get_available_models()
     if model in available_models:
-        print("loading new model")
-        unload_model()
+        try:
+            print("loading new model")
+            unload_model()
 
-        # Set up new model, change wbits, etc:
-        shared.model_name = req.model
-        shared.model, shared.tokenizer = load_model(shared.model_name)
-        # set model name
-        # set model type?
-        # set model wbits?
-        # set model groupsize?
+            # Set up new model, change wbits, etc:
+            shared.model_name = req.model
+            shared.model, shared.tokenizer = load_model(shared.model_name)
+            # set model name
+            # set model type?
+            # set model wbits?
+            # set model groupsize?
+        except Exception as e:
+            return { "err": str(e) }
 
         return { "model": shared.model_name } #(shared.model_name, shared.wbits) 
     else:
