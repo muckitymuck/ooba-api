@@ -4,6 +4,7 @@ import time
 import requests
 
 
+# modify generate to return tokens and then we can get tokens/sec
 def time_function_execution(func, *args, **kwargs):
     start_time = time.time()
     func(*args, **kwargs)
@@ -62,6 +63,10 @@ def generate(message):
             if chunk:
                 print(chunk.decode("utf-8"), end="", flush=True)
 
+    # append chunks in for loop..
+    # then get the number of tokens.. return from generate:
+    #tokens = encode(body['prompt'])[0]
+    # that way we can use it in the timing function to get tokens/sec
 
 #---
 
