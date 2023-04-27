@@ -105,4 +105,4 @@ if __name__ == "__main__":
     #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
 
     # test with / without:
-    # --quant-attn --warmup-autotune, etc
+    # --quant-attn --warmup-autotune, --fused_mlp
