@@ -174,13 +174,6 @@ async def stream_data(req: GenerateRequest):
         semaphore.release()
 
 
-# do we just need model name here? shared.model_name
-# we may want to keep track of 'shared.args.wbit' from the filename so we can set this field before we change models.
-#def reload_model():
-#    unload_model()
-#    shared.model, shared.tokenizer = load_model(shared.model_name)
-
-
 # fastAPI call to get models. it can 'ls -l ~/llm_models' with subprocess and return the output
 @app.get("/get_models")
 def get_models():
@@ -195,6 +188,21 @@ def get_models():
     #print(filenames)
 
     return { "models": filenames}
+
+
+#@app.post("/models")
+@app.get("/models")
+def set_model():
+    print("booyah")
+    print(shared.model_name)
+    print(shared.wbits) # maybe i can normalize the names so we can let ooba guess how to run it. we should test with show-models
+    # ^ might need to manually set these so ooba is set correctly.
+
+    # do we just need model name here? shared.model_name
+    # we may want to keep track of 'shared.args.wbit' from the filename so we can set this field before we change models.
+    #def reload_model():
+    #    unload_model()
+    #    shared.model, shared.tokenizer = load_model(shared.model_name)
 
 
 if __name__ == "__main__":
