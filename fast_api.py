@@ -242,14 +242,14 @@ def set_model(req: ModelRequest):
             print(shared.model_name)
             print(shared.model_type)
             print(shared.args.wbits)
-            print(shared.groupsize)
+            print(shared.args.groupsize)
 
             if "4bit" in req.model.lower():
                 shared.args.wbits = 4
                 shared.groupsize = 128
             else:
                 shared.args.wbits = None
-                shared.groupsize = None
+                shared.args.groupsize = None
 
             # elif.. stability AI, RXVN
             if "OPT" in req.model.lower():
@@ -261,7 +261,7 @@ def set_model(req: ModelRequest):
             print(shared.model_name)
             print(shared.model_type)
             print(shared.args.wbits)
-            print(shared.groupsize)
+            print(shared.args.groupsize)
             
             # Set up new model, change wbits, etc:
             shared.model_name = req.model
