@@ -238,13 +238,34 @@ def set_model(req: ModelRequest):
             print("loading new model")
             unload_model()
 
+            print("[before]:")
+            print(shared.model_name)
+            print(shared.model_type)
+            print(shared.wbits)
+            print(shared.groupsize)
+
+            if "4bit" in req.model:
+                shared.wbits = 4
+                shared.groupsize = 128
+            else:
+                shared.wbits = None
+                shared.groupsize = None
+
+            # elif.. stability AI, RXVN
+            if "OPT" in req.model:
+                shared.model_type = "OPT"
+            else: 
+                shared.model_type = "llama"
+
+            print("[after]:")
+            print(shared.model_name)
+            print(shared.model_type)
+            print(shared.wbits)
+            print(shared.groupsize)
+            
             # Set up new model, change wbits, etc:
             shared.model_name = req.model
             shared.model, shared.tokenizer = load_model(shared.model_name)
-            # set model name
-            # set model type?
-            # set model wbits?
-            # set model groupsize?
         except Exception as e:
             return { "err": str(e) }
 
