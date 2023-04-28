@@ -248,7 +248,7 @@ def set_model(req: ModelRequest):
             if "4bit" in req.model.lower():
                 print("4b")
                 shared.args.wbits = 4
-                shared.groupsize = 128
+                shared.args.groupsize = 128
             else:
                 if "7b" in req.model.lower():
                     print("7b")
