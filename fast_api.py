@@ -243,13 +243,20 @@ def set_model(req: ModelRequest):
             print(shared.model_type)
             print(shared.args.wbits)
             print(shared.args.groupsize)
+            print(shared.args.load_in_8bit)
 
             if "4bit" in req.model.lower():
                 shared.args.wbits = 4
                 shared.groupsize = 128
             else:
-                shared.args.wbits = None
-                shared.args.groupsize = None
+                if "7b" in req.model.lower():
+                    shared.args.wbits = None
+                    shared.args.groupsize = None
+                    shared.args.load_in_8bit = False
+                else:
+                    shared.args.wbits = None
+                    shared.args.groupsize = None
+                    shared.args.load_in_8bit = True
 
             # elif.. stability AI, RXVN
             if "OPT" in req.model.lower():
@@ -262,6 +269,7 @@ def set_model(req: ModelRequest):
             print(shared.model_type)
             print(shared.args.wbits)
             print(shared.args.groupsize)
+            print(shared.args.load_in_8bit)
             
             # Set up new model, change wbits, etc:
             shared.model_name = req.model
