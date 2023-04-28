@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     # Get, Set modals:
     #print( get_models() )
-    print( set_model("vicuna-13B-1.1-4bit") )
+    print( set_model("koala-13B-HF") )
 
     # Get, Set text:
     #print( get_loras() )

@@ -250,12 +250,12 @@ def set_model(req: ModelRequest):
                 shared.groupsize = 128
             else:
                 if "7b" in req.model.lower():
-                    shared.args.wbits = None
-                    shared.args.groupsize = None
+                    shared.args.wbits = 0
+                    shared.args.groupsize = -1
                     shared.args.load_in_8bit = False
                 else:
-                    shared.args.wbits = None
-                    shared.args.groupsize = None
+                    shared.args.wbits = 0
+                    shared.args.groupsize = -1
                     shared.args.load_in_8bit = True
 
             # elif.. stability AI, RXVN
