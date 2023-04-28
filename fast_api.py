@@ -235,7 +235,7 @@ def set_model(req: ModelRequest):
     available_models = get_available_models()
     if model in available_models:
         try:
-            print(f"loading new model: {req.}")
+            print(f"loading new model: {req.model}")
             unload_model()
 
             print("[before]:")
