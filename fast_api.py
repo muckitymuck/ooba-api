@@ -235,7 +235,7 @@ def set_model(req: ModelRequest):
     available_models = get_available_models()
     if model in available_models:
         try:
-            print("loading new model")
+            print(f"loading new model: {req.}")
             unload_model()
 
             print("[before]:")
@@ -246,14 +246,17 @@ def set_model(req: ModelRequest):
             print(shared.args.load_in_8bit)
 
             if "4bit" in req.model.lower():
+                print("4b")
                 shared.args.wbits = 4
                 shared.groupsize = 128
             else:
                 if "7b" in req.model.lower():
+                    print("7b")
                     shared.args.wbits = 0
                     shared.args.groupsize = -1
                     shared.args.load_in_8bit = False
                 else:
+                    print("other")
                     shared.args.wbits = 0
                     shared.args.groupsize = -1
                     shared.args.load_in_8bit = True
@@ -264,6 +267,9 @@ def set_model(req: ModelRequest):
             else: 
                 shared.model_type = "HF_generic" #? llama, etc
 
+            # Set new model name!
+            shared.model_name = req.model
+
             print("[after]:")
             print(shared.model_name)
             print(shared.model_type)
@@ -271,8 +277,7 @@ def set_model(req: ModelRequest):
             print(shared.args.groupsize)
             print(shared.args.load_in_8bit)
             
-            # Set up new model, change wbits, etc:
-            shared.model_name = req.model
+            
             shared.model, shared.tokenizer = load_model(shared.model_name)
         except Exception as e:
             return { "err": str(e) }
