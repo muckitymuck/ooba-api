@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-import pymysql
 import asyncio
 import uvicorn
 import subprocess
@@ -177,11 +176,13 @@ async def stream_data(req: GenerateRequest):
                 last_answer = answer
                 _len = len(last_answer)
 
-                _full_answer += _answ.encode("utf-8")
+                _full_answer += _answ
 
                 yield _answ.encode("utf-8")
 
             if req.log==True:
+                import pymysql
+
                 print("[log_response]:")
                 # Establish a connection to the database
                 db_pw = os.environ.get('DB_PW')
