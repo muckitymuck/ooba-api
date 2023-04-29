@@ -28,7 +28,6 @@ def get_available_models():
 
 
 def get_available_loras():
-    # need to generalize this path using relative path.. lazy..
     result = subprocess.run(['ls', '-l', shared.args.lora_dir], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8')
 
@@ -39,7 +38,6 @@ def get_available_loras():
     filenames = [line.split()[-1] for line in lines if line.strip()]
     filenames.remove("place-your-loras-here.txt")
 
-    print(filenames)
     return sorted(filenames[1:])
 
 
@@ -47,6 +45,7 @@ def get_available_loras():
 app = FastAPI()
 semaphore = asyncio.Semaphore(1)
 
+# I need open CORS for my setup, you may not!!
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -84,6 +83,7 @@ class GenerateRequest(BaseModel):
     log: Optional[bool] = True
 
 
+# Booyah!
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
     return {"wintermute": "Hellow World!", "q": q}
@@ -215,18 +215,19 @@ async def stream_data(req: GenerateRequest):
                 _prompt = req.prompt.replace('\n', '\\n')
                 _full_answer = _full_answer.replace('\n', '\\n')
                 _tokens_sec = new_tokens/(t1-t0)
+                _params = ' '.join(sys.argv[1:])
                 _eval = 0
 
                 # Execute an insert query
                 try:
                     with connection.cursor() as cursor:
                         sql = "INSERT INTO llm_logs (model, question, answer, new_tokens, token_sec, context, follow_up, bits_loaded, run_params, eval) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, None, _bits, "params", _eval)
+                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, None, _bits, _params, _eval)
 
                         # insert into DB:
                         cursor.execute(sql, values)
                         connection.commit()
-                        print(cursor.rowcount, "record inserted.")
+                        #print(cursor.rowcount, "record inserted.")
                 finally:
                     # Close the connection
                     connection.close()
