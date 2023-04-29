@@ -210,8 +210,7 @@ async def stream_data(req: GenerateRequest):
                 try:
                     with connection.cursor() as cursor:
                         sql = "INSERT INTO llm_logs (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                        print(sql)
-                        values = (shared.model_name, req.prompt, _full_answer, 0, _bits, "params", None)
+                        values = (shared.model_name, req.prompt.replace('\n', '\\n'), _full_answer.replace('\n', '\\n'), 0, _bits, "params", None)
                         print(values)
                         cursor.execute(sql, values)
                         connection.commit()
