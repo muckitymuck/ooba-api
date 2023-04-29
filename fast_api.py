@@ -261,25 +261,7 @@ async def stream_data(req: GenerateRequest):
     headers = { 'Content-Type': 'application/json' }
     payload = { 'messages': messages }
 
-    #response = requests.post("https://3jane.net/generate", headers=headers, data=json.dumps(payload), stream=True)
-
-    # re-yield this and stream it back:
-    async def gen():
-        for chunk in r.iter_content(chunk_size=64):
-            if chunk:
-                data = {"chunk": chunk.decode("utf-8")}
-                json_str = json.dumps(data)
-                yield json_str
-                await asyncio.sleep(0.1)
-                #print(chunk.decode("utf-8"), flush=True)
-    
-        # last chunk sent:
-        data = {"chunk": "[fin]."}
-        json_str = json.dumps(data)
-        yield json_str
-
-    generator = gen()
-    #eturn EventSourceResponse(generator)
+    # Directly return the Requests response stream:
     return StreamingResponse(requests.post("https://3jane.net/generate", headers=headers, data=json.dumps(payload), stream=True), media_type='text/event-stream')
 
 

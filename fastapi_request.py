@@ -86,22 +86,57 @@ AI:"""
                 print(chunk.decode("utf-8"), end="", flush=True)
 
 
-# chatgpt endpoint for convience.. it uses my website's endpoint because i'm lazy.
+# chatgpt endpoint for convience.. it uses my website's endpoint because i dont want to expost my open ai api key :P you are free to re-implement with your own, instead!
 def chatgpt(message):
+    # currently only supporting 1 message at a time, not a chain of messages, as that is not what I am using this for.
     data = {
-        "messages": [message], 
+        "messages": [{"role": "user", "content": message}], 
         "temperature": 0.7, # set to 1 for evals for reproducability?
-
     }
 
     r = requests.post("https://3jane.net/generate", data=json.dumps(data), stream=True)
+    
+    if r.status_code == 200:
+        _RESPONSE = ""
+        for line in r.iter_lines():
+            # Filter out keep-alive new lines and decode the content
+            if line:
+                decoded_line = line.decode('utf-8')
 
-    if r.status_code==200:
-        for chunk in r.iter_content(chunk_size=64):
-            if chunk:
-                print(chunk.decode("utf-8"), end="", flush=True)
+                # Remove the "data: " prefix
+                json_line = decoded_line.replace("data: ", "")
 
+                try:
+                    # Load the JSON data into a Python dictionary
+                    json_data = json.loads(json_line)
 
+                    if 'chunk' in json_data:
+                        # Extract the inner JSON strings from the 'chunk' key and split them by     newline characters
+                        inner_json_strings = json_data['chunk'].replace("data: ", "").split('\n')
+
+                        for inner_json_string in inner_json_strings:
+                            if inner_json_string.strip():
+                                # Load the inner JSON string into a Python dictionary
+                                inner_json_data = json.loads(inner_json_string)
+
+                                # Access the desired content
+                                content = inner_json_data['choices'][0]['delta'].get('content', '')
+                                _RESPONSE += content
+                                print(content, end="", flush=True)
+                    else:
+                        # Directly access the desired content from the json_data
+                        content = json_data['choices'][0]['delta']['content']
+                        print(content)
+
+                except json.JSONDecodeError as e:
+                    pass
+                    #print(f"Error decoding JSON: {e}")
+
+        return { "response": _RESPONSE }
+    else:
+        return { "status_code": r.status_code}
+
+            
 # Here we generate the test script:
 # we can accept tuple: (models, loras) if we want to do lora later?
 # want to accept questions[] list, or file.
@@ -132,9 +167,10 @@ if __name__ == "__main__":
     # Generate response:
     try:
         #gen_time = time_function_execution( generate, sys.argv[1] )
-        gen_time = time_function_execution( chatgpt, sys.argv[1] )
-    except:
+        print( chatgpt(sys.argv[1]) )
+    except Exception as e:
         print('Missing arguments, try: python3 fastapi_request.py "hello"')
+        print("OR: {0}".format(str(e)))
 
     # Get Number of Tokens:
     #print( get_tokens("How many tokens is this?") )
