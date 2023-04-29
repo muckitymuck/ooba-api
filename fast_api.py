@@ -232,6 +232,7 @@ async def stream_data(req: GenerateRequest):
                     _eval = 1
                 else:
                     _prompt = None
+                    _eval = 0
 
                 # Execute an insert query
                 try:
