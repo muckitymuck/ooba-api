@@ -16,8 +16,12 @@ def time_function_execution(func, *args, **kwargs):
     return elapsed_time
 
 
-def clear_loras():
-    r = requests.get("http://wintermute:7861/clear_loras")
+def get_tokens(prompt):
+    data = {
+        "prompt": prompt,
+    }
+
+    r = requests.post("http://wintermute:7861/tokens",  json=data)
     return r.json()
 
 
@@ -99,12 +103,15 @@ if __name__ == "__main__":
     # Generate response:
     #gen_time = time_function_execution( generate, sys.argv[1] )
 
+    # Get Number of Tokens:
+    print( get_tokens("How many tokens is this?") )
+
     # Get, Set modals:
     #print( get_models() )
     #print( set_model("vicuna-13B-1.1-4bit") )
 
     # Get, Set text:
-    print( get_loras() )
+    #print( get_loras() )
     #print( set_loras(["homer"]) )
 
     # Test model:
