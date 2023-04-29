@@ -178,7 +178,7 @@ async def stream_data(req: GenerateRequest):
                     answer = a[0]
 
                 # remove prompt from response:
-                answer = answer.replace(req.prompt,"")
+                answer = answer.replace(_MESSAGE,"")
 
                 # remove last part of the stream from response:
                 _answ = answer[_len:]
