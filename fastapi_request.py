@@ -114,10 +114,10 @@ def test_model(models):
 
 if __name__ == "__main__":
     # Generate response:
-    #try:
-    #    gen_time = time_function_execution( generate, sys.argv[1] )
-    #except:
-    #    print('Missing arguments, try: python3 fastapi_request.py "hello"')
+    try:
+        gen_time = time_function_execution( generate, sys.argv[1] )
+    except:
+        print('Missing arguments, try: python3 fastapi_request.py "hello"')
 
     # Get Number of Tokens:
     #print( get_tokens("How many tokens is this?") )
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("koala-13B-HF-4bit")
+    #test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
