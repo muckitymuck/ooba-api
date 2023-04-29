@@ -67,14 +67,12 @@ def generate(message, format="instruct"):
 AI:"""
     else:
         print("instruct format mismatch")
-        _PROMPT = message
-
-    # place user message into prompt: 
-    _PROMPT = _PROMPT.replace("{user_input}", message)
+        _PROMPT = "" #message
 
     # setup json payload:
     data = {
         "prompt": _PROMPT,
+        "message": message, 
         "temperature": 0.7, # set to 1 for evals for reproducability?
         "log": True,
         #"streaming": False
@@ -133,6 +131,6 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("vicuna-13B-1.1-4bit")
+    test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])

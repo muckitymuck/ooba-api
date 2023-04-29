@@ -54,9 +54,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# place user message into prompt: 
+_PROMPT = _PROMPT.replace("{user_input}", message)
 class GenerateRequest(BaseModel):
-    prompt: str
+    message: str
+    prompt: Optional[str] = None
     max_new_tokens: Optional[int] = 200
     do_sample: Optional[bool] = True
     temperature: Optional[float] = 0.7
@@ -110,7 +112,12 @@ async def stream_data(req: GenerateRequest):
             await asyncio.sleep(1)
 
     try:
-        #print(req.prompt)
+        # place user message into prompt:
+        if req.prompt:
+            _MESSAGE = req.prompt.replace("{user_input}", req.message)
+        else:
+            _MESSAGE = req.message
+        print(_MESSAGE)
 
         generate_params = {
             'max_new_tokens': req.max_new_tokens,
@@ -151,7 +158,7 @@ async def stream_data(req: GenerateRequest):
     
         # start generating response:
         generator = generate_reply(
-            req.prompt, #question
+            _MESSAGE,#req.prompt, #question
             generate_params, #state
             eos_token=None,
             stopping_strings= stop,
