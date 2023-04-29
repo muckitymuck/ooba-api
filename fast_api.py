@@ -223,11 +223,15 @@ async def stream_data(req: GenerateRequest):
                 # pretty vars:
                 _temp = req.temperature
                 _question = req.message.replace('\n', '\\n')
-                _prompt = req.prompt.replace('\n', '\\n')
                 _full_answer = _full_answer.replace('\n', '\\n')
                 _tokens_sec = new_tokens/(t1-t0)
                 _params = ' '.join(sys.argv[1:])
-                _eval = 0
+                # prompt and eval can be tied because of the different ways I submit these requests:
+                if req.prompt:
+                    _prompt = req.prompt.replace('\n', '\\n')
+                    _eval = 1
+                else:
+                    _prompt = None
 
                 # Execute an insert query
                 try:
