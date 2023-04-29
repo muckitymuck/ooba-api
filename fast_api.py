@@ -305,6 +305,8 @@ class ModelRequest(BaseModel):
 # set model:
 @app.post("/models")
 def set_model(req: ModelRequest):
+    if req.model == shared.model_name:
+        return { "model": shared.model_name, "note": "no change." }
 
     available_models = get_available_models()
     if model in available_models:
@@ -350,7 +352,7 @@ def set_model(req: ModelRequest):
         else:
             _bits = shared.args.wbits
 
-        return { "model": shared.model_name, "bits": _bits, "groupsize": shared.args.groupsize  } #(shared.model_name, shared.wbits) 
+        return { "model": shared.model_name, "bits": _bits, "groupsize": shared.args.groupsize  }
     else:
         models_str = ", ".join(available_models)
         return { "err": "model not in list: [{0}] {1}".format(models_str, model) }

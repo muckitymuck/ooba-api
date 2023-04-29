@@ -60,19 +60,23 @@ def generate(message, format="instruct"):
 ### Instruction:
 {user_input}
 ### Response:"""
-        _PROMPT = _PROMPT.replace("{user_input}", message)
     elif "complete" in format.lower():
         _PROMPT = "{user_input} "
-        _PROMPT = _PROMPT.replace("{user_input}", message)
+    elif "chat" in format.lower():
+        _PROMPT = """User: {user_input}
+AI:"""
     else:
         print("instruct format mismatch")
         _PROMPT = message
+
+    # place user message into prompt: 
+    _PROMPT = _PROMPT.replace("{user_input}", message)
 
     # setup json payload:
     data = {
         "prompt": _PROMPT,
         "temperature": 0.7, # set to 1 for evals for reproducability?
-        "log": True
+        "log": True,
         #"streaming": False
     }
 
@@ -97,11 +101,11 @@ def test_model(models):
         print(f"Loading model {model}:")
         set_model(model)
 
-        generate("What is the best way to make money with a 100W laser cutter?", "instruct")
-        generate("There are 2 boys playing with 2 balls. One is red and One is blue. One of the boys is colorblind. What color do you think the balls are?", "complete")
-        generate("rewrite style='width:500px' in tailwind.css")
-        generate("")
-        #generate("")
+        generate("What is the best way to make money with a 100W laser cutter?")
+        generate("There are 2 boys playing with 2 balls. One is red and One is blue. One of the boys is colorblind. What color do you think the balls are?")
+        generate("Rewrite this CSS style='width:500px' in tailwind.css")
+        generate("Write me a python function that uses Requests to make a post request to this endpoint http://example.com/endpoint with the json payload 'message': 'booyah!'")
+        generate("Anna takes a ball and puts it in a red box, then leaves the room. Bob takes the ball out of the red box and puts it into the yellow box, then leaves the room. Anna returns to the room. Where will she look for the ball?")
         #generate("")
         #generate("")
 
@@ -112,10 +116,11 @@ def test_model(models):
 
 if __name__ == "__main__":
     # Generate response:
-    try:
-        gen_time = time_function_execution( generate, sys.argv[1] )
-    except:
-        print('Missing arguments, try: python3 fastapi_request.py "hello"')
+    #try:
+    #    gen_time = time_function_execution( generate, sys.argv[1] )
+    #except:
+    #    print('Missing arguments, try: python3 fastapi_request.py "hello"')
+
     # Get Number of Tokens:
     #print( get_tokens("How many tokens is this?") )
 
@@ -128,6 +133,6 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    #test_model("vicuna-13B-1.1-4bit")
+    test_model("vicuna-13B-1.1-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
