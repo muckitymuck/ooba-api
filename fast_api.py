@@ -29,7 +29,7 @@ def get_available_models():
 
 def get_available_loras():
     print("lora dir?")
-    print(shared.args.model_dir)
+    print(shared.args.lora_dir)
     print("_____")
     # need to generalize this path using relative path.. lazy..
     result = subprocess.run(['ls', '-l', '/home/nap/Documents/llm-api/loras/'], stdout=subprocess.PIPE)
