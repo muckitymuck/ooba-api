@@ -209,23 +209,23 @@ async def stream_data(req: GenerateRequest):
                 else:
                     _bits = shared.args.wbits
                 
-                # tokens/sec:
+                # calc tokens/sec:
                 t1 = time.time()
                 original_tokens = len(encode(req.prompt)[0])
                 new_tokens = len(encode(_full_answer)[0])
-                print(req.prompt)
-                print(original_tokens)
-                print("_____")
-                print(_full_answer)
-                print(len(encode(_full_answer)[0]))
+                # pretty vars:
+                _prompt = req.prompt.replace('\n', '\\n')
+                _full_answer = _full_answer.replace('\n', '\\n')
+                _tokens_sec = new_tokens/(t1-t0)
+
                 print(f'init: Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens})')
 
                 # Execute an insert query
                 try:
                     with connection.cursor() as cursor:
-                        sql = "INSERT INTO llm_logs (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                        values = (shared.model_name, req.prompt.replace('\n', '\\n'), _full_answer.replace('\n', '\\n'), 0, _bits, "params", None)
-                        print(values)
+                        sql = "INSERT INTO llm_logs (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, _bits, "params", None)
+                        #print(values)
                         cursor.execute(sql, values)
                         connection.commit()
                         print(cursor.rowcount, "record inserted.")
