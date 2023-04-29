@@ -254,15 +254,9 @@ class TokenizeRequest(BaseModel):
 # endpoint for getting # of tokens:
 @app.post("/tokens")
 def get_tokens(req: TokenizeRequest):
-    print(req.prompt)
     og = encode(req.prompt)
-    print(og)
-    print("____")
     input_ids = encode(req.prompt)[0]
-    print(input_ids)
-    print("----")
-    print(input_ids[0])
-    print("---")
+    integer_list = [int(input_ids) for input_ids in tensor.tolist()]
     return { "token_count": len(input_ids), "tokens": input_ids[0] }
 
 
