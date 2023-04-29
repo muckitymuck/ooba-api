@@ -262,7 +262,7 @@ def get_tokens(req: TokenizeRequest):
     print(input_ids)
     print("----")
     #print("---")
-    return { "token_count": len(input_ids), "tokens": input_ids }
+    return { "token_count": len(input_ids), "tokens": input_ids[0] }
 
 
 # endpoint for getting # of tokens: ????
