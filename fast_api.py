@@ -221,8 +221,8 @@ async def stream_data(req: GenerateRequest):
                 # Execute an insert query
                 try:
                     with connection.cursor() as cursor:
-                        sql = "INSERT INTO llm_logs (model, question, answer, new_tokens, token_sec, context, follow_up, bits_loaded, run_params, eval) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, None, _bits, _params, _eval)
+                        sql = "INSERT INTO llm_logs (model, question, answer, new_tokens, token_sec, context, bits_loaded, run_params, eval) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, _bits, _params, _eval)
 
                         # insert into DB:
                         cursor.execute(sql, values)
