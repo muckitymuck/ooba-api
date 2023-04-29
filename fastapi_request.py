@@ -85,14 +85,12 @@ def test_model(models):
         models = [models]
 
     for model in models:
+        print(f"Loading model {model}:")
         set_model(model)
 
-        print(f"Testing model {model}:")
         gen_time = time_function_execution( generate, "question 1" )
         gen_time = time_function_execution( generate, "question 2" )
         gen_time = time_function_execution( generate, "question 3" )
-        # put model, question, answer, and time all into a mysql database
-        print()
 
     print("End of testing.")
 
@@ -104,7 +102,7 @@ if __name__ == "__main__":
     #gen_time = time_function_execution( generate, sys.argv[1] )
 
     # Get Number of Tokens:
-    print( get_tokens("How many tokens is this?") )
+    #print( get_tokens("How many tokens is this?") )
 
     # Get, Set modals:
     #print( get_models() )
@@ -117,7 +115,4 @@ if __name__ == "__main__":
     # Test model:
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model("vicuna-13B-1.1-4bit")
-    #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
-
-    # test with / without:
-    # --quant-attn --warmup-autotune, --fused_mlp
+    test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
