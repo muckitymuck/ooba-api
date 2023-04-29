@@ -213,6 +213,11 @@ async def stream_data(req: GenerateRequest):
                 t1 = time.time()
                 original_tokens = len(encode(req.prompt)[0])
                 new_tokens = len(encode(_full_answer)[0]) - original_tokens
+                print(req.prompt)
+                print(original_tokens)
+                print("_____")
+                print(_full_answer)
+                print(new_tokens)
                 print(f'init: Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens})')
 
                 # Execute an insert query
@@ -241,6 +246,24 @@ def get_models():
     available_loras = get_available_loras()
 
     return { "current": shared.lora_names, "loras": available_loras }
+
+
+class TokenizeRequest(BaseModel):
+    prompt: str
+
+
+# endpoint for getting # of tokens:
+@app.post("/tokens")
+def get_tokens(req: TokenizeRequest):
+    input_ids = encode(req.prompt)[0]
+    return { "token_count": len(input_ids), "tokens": input_ids }
+
+
+# endpoint for getting # of tokens: ????
+@app.get("/tokens")
+def get_tokens(req: str):
+    input_ids = encode(req)[0]
+    return { "token_count": len(input_ids), "tokens": input_ids }
 
 
 class LoraRequest(BaseModel):

@@ -24,14 +24,11 @@ def get_max_prompt_length(state):
 
 
 def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_length=None):
-    print("in encode: {}".format(prompt))
     if shared.model_type in ['rwkv', 'llamacpp']:
-        print("1")
         input_ids = shared.tokenizer.encode(str(prompt))
         input_ids = np.array(input_ids).reshape(1, len(input_ids))
         return input_ids
     else:
-        print("2")
         input_ids = shared.tokenizer.encode(str(prompt), return_tensors='pt', add_special_tokens=add_special_tokens)
 
         # This is a hack for making replies more creative.
@@ -48,20 +45,15 @@ def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_lengt
         input_ids = input_ids[:, -truncation_length:]
 
     if shared.model_type in ['rwkv', 'llamacpp'] or shared.args.cpu:
-        print("3")
         return input_ids
     elif shared.args.flexgen:
-        print("4")
         return input_ids.numpy()
     elif shared.args.deepspeed:
-        print("5")
         return input_ids.to(device=local_rank)
     elif torch.has_mps:
-        print("6")
         device = torch.device('mps')
         return input_ids.to(device)
     else:
-        print("7")
         return input_ids.cuda()
 
 
