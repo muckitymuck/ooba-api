@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import time
 import asyncio
 import uvicorn
 import subprocess
@@ -160,6 +161,8 @@ async def stream_data(req: GenerateRequest):
             answer_str = ""
             last_answer = ""
             _full_answer = ""
+    
+            t0 = time.time()
             for a in generator:
                 if isinstance(a, str):
                     answer = a
@@ -205,6 +208,12 @@ async def stream_data(req: GenerateRequest):
                         _bits = 16
                 else:
                     _bits = shared.args.wbits
+                
+                # tokens/sec:
+                t1 = time.time()
+                original_tokens = len(encode(req.prompt)
+                new_tokens = len(encode(_full_answer) - original_tokens
+                print(f'init: Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens})')
 
                 # Execute an insert query
                 try:
