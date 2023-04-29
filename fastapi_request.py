@@ -11,7 +11,7 @@ def time_function_execution(func, *args, **kwargs):
     end_time = time.time()
 
     elapsed_time = end_time - start_time
-    print(f"Function '{func.__name__}' took {elapsed_time:.2f} seconds to execute.")
+    print(f"\n[Function '{func.__name__}' took {elapsed_time:.2f} seconds to execute.]")
 
     return elapsed_time
 
@@ -53,10 +53,25 @@ def set_model(model_name):
     return r.json()
 
 
-def generate(message):
+def generate(message, format="instruct"):
+    #set prompt, change prompt: maybe move this into it's own fucntion:
+    if "instruct" in format.lower():
+        _PROMPT = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+### Instruction:
+{user_input}
+### Response:"""
+        _PROMPT = _PROMPT.replace("{user_input}", message)
+    elif "complete" in format.lower():
+        _PROMPT = "{user_input} "
+        _PROMPT = _PROMPT.replace("{user_input}", message)
+    else:
+        print("instruct format mismatch")
+        _PROMPT = message
+
+    # setup json payload:
     data = {
-        "prompt": message,
-        "temperature": 0.7,
+        "prompt": _PROMPT,
+        "temperature": 0.7, # set to 1 for evals for reproducability?
         "log": True
         #"streaming": False
     }
@@ -68,12 +83,6 @@ def generate(message):
             if chunk:
                 print(chunk.decode("utf-8"), end="", flush=True)
 
-    # append chunks in for loop..
-    # then get the number of tokens.. return from generate:
-    #tokens = encode(body['prompt'])[0]
-    # that way we can use it in the timing function to get tokens/sec
-
-#---
 
 # Here we generate the test script:
 # we can accept tuple: (models, loras) if we want to do lora later?
@@ -88,9 +97,13 @@ def test_model(models):
         print(f"Loading model {model}:")
         set_model(model)
 
-        gen_time = time_function_execution( generate, "question 1" )
-        gen_time = time_function_execution( generate, "question 2" )
-        gen_time = time_function_execution( generate, "question 3" )
+        generate("What is the best way to make money with a 100W laser cutter?", "instruct")
+        generate("There are 2 boys playing with 2 balls. One is red and One is blue. One of the boys is colorblind. What color do you think the balls are?", "complete")
+        generate("rewrite style='width:500px' in tailwind.css")
+        generate("")
+        #generate("")
+        #generate("")
+        #generate("")
 
     print("End of testing.")
 
@@ -99,8 +112,10 @@ def test_model(models):
 
 if __name__ == "__main__":
     # Generate response:
-    #gen_time = time_function_execution( generate, sys.argv[1] )
-
+    try:
+        gen_time = time_function_execution( generate, sys.argv[1] )
+    except:
+        print('Missing arguments, try: python3 fastapi_request.py "hello"')
     # Get Number of Tokens:
     #print( get_tokens("How many tokens is this?") )
 
@@ -113,6 +128,6 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model("vicuna-13B-1.1-4bit")
-    test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
+    #test_model(["alpaca-30b-lora-4bit-128g"])
+    #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
