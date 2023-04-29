@@ -4,18 +4,6 @@ import time
 import requests
 
 
-# modify generate to return tokens and then we can get tokens/sec
-def time_function_execution(func, *args, **kwargs):
-    start_time = time.time()
-    func(*args, **kwargs)
-    end_time = time.time()
-
-    elapsed_time = end_time - start_time
-    print(f"\n[Function '{func.__name__}' took {elapsed_time:.2f} seconds to execute.]")
-
-    return elapsed_time
-
-
 def get_tokens(prompt):
     data = {
         "prompt": prompt,
@@ -165,12 +153,14 @@ def test_model(models):
 
 if __name__ == "__main__":
     # Generate response:
+    '''
     try:
-        #gen_time = time_function_execution( generate, sys.argv[1] )
-        print( chatgpt(sys.argv[1]) )
+        generate(sys.argv[1])
+        #print( chatgpt(sys.argv[1]) )
     except Exception as e:
         print('Missing arguments, try: python3 fastapi_request.py "hello"')
         print("OR: {0}".format(str(e)))
+    '''
 
     # Get Number of Tokens:
     #print( get_tokens("How many tokens is this?") )
@@ -184,6 +174,7 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
+    test_model("vicuna-13B-1.1-4bit")
     #test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
