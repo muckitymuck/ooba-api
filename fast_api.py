@@ -261,7 +261,8 @@ def get_tokens(req: TokenizeRequest):
     input_ids = encode(req.prompt)[0]
     print(input_ids)
     print("----")
-    #print("---")
+    print(input_ids[0])
+    print("---")
     return { "token_count": len(input_ids), "tokens": input_ids[0] }
 
 
