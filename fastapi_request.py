@@ -89,8 +89,9 @@ AI:"""
 # chatgpt endpoint for convience.. it uses my website's endpoint because i'm lazy.
 def chatgpt(message):
     data = {
-        "message": message, 
+        "messages": [message], 
         "temperature": 0.7, # set to 1 for evals for reproducability?
+
     }
 
     r = requests.post("https://3jane.net/generate", data=json.dumps(data), stream=True)

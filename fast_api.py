@@ -261,7 +261,7 @@ async def stream_data(req: GenerateRequest):
     headers = { 'Content-Type': 'application/json' }
     payload = { 'messages': messages }
 
-    response = requests.post("https://3jane.net/generate", headers=headers, data=json.dumps(payload), stream=True)
+    #response = requests.post("https://3jane.net/generate", headers=headers, data=json.dumps(payload), stream=True)
 
     # re-yield this and stream it back:
     async def gen():
@@ -279,7 +279,8 @@ async def stream_data(req: GenerateRequest):
         yield json_str
 
     generator = gen()
-    return EventSourceResponse(generator)
+    #eturn EventSourceResponse(generator)
+    return StreamingResponse(requests.post("https://3jane.net/generate", headers=headers, data=json.dumps(payload), stream=True), media_type='text/event-stream')
 
 
 # get models:
