@@ -217,15 +217,15 @@ async def stream_data(req: GenerateRequest):
                 _prompt = req.prompt.replace('\n', '\\n')
                 _full_answer = _full_answer.replace('\n', '\\n')
                 _tokens_sec = new_tokens/(t1-t0)
-
-                print(f'init: Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens})')
+                _eval = 0
 
                 # Execute an insert query
                 try:
                     with connection.cursor() as cursor:
-                        sql = "INSERT INTO llm_logs (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, _bits, "params", None)
-                        #print(values)
+                        sql = "INSERT INTO llm_logs (model, question, answer, new_tokens, token_sec, context, follow_up, bits_loaded, run_params, eval) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, None, _bits, "params", _eval)
+                        
+                        # insert into DB:
                         cursor.execute(sql, values)
                         connection.commit()
                         print(cursor.rowcount, "record inserted.")
