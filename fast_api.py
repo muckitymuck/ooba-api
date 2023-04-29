@@ -257,7 +257,7 @@ def get_tokens(req: TokenizeRequest):
     og = encode(req.prompt)
     input_ids = encode(req.prompt)[0]
     integer_list = [int(x) for x in input_ids.tolist()]
-    return { "token_count": len(input_ids), "tokens": input_ids[0] }
+    return { "token_count": len(input_ids), "tokens": integer_list }
 
 
 # endpoint for getting # of tokens: ????
