@@ -254,21 +254,17 @@ class TokenizeRequest(BaseModel):
 # endpoint for getting # of tokens:
 @app.post("/tokens")
 def get_tokens(req: TokenizeRequest):
-    og = encode(req.prompt)
     input_ids = encode(req.prompt)[0]
     integer_list = [int(x) for x in input_ids.tolist()]
     return { "token_count": len(input_ids), "tokens": integer_list }
 
 
-# endpoint for getting # of tokens: ????
-@app.get("/tokens")
-def get_tokens(req: str):
-    input_ids = encode(req)[0]
-    print(req)
-    print("---")
-    print(input_ids)
-    print("----")
-    return { "token_count": len(input_ids), "tokens": input_ids }
+# sure, why not.. a get endpoint too
+@app.get("/tokens/{prompt}")
+def get_tokens():
+    input_ids = encode(prompt)[0]
+    integer_list = [int(x) for x in input_ids.tolist()]
+    return { "token_count": len(input_ids), "tokens": integer_list }
 
 
 class LoraRequest(BaseModel):
