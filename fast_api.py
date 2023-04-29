@@ -192,7 +192,7 @@ async def stream_data(req: GenerateRequest):
                     host='wintermute',
                     user='nap',
                     password=f'{db_pw}',
-                    database='llm_log',
+                    database='wntr',
                     charset='utf8mb4',
                     cursorclass=pymysql.cursors.DictCursor
                 )
