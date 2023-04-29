@@ -86,6 +86,21 @@ AI:"""
                 print(chunk.decode("utf-8"), end="", flush=True)
 
 
+# chatgpt endpoint for convience.. it uses my website's endpoint because i'm lazy.
+def chatgpt(message):
+    data = {
+        "message": message, 
+        "temperature": 0.7, # set to 1 for evals for reproducability?
+    }
+
+    r = requests.post("https://3jane.net/generate", data=json.dumps(data), stream=True)
+
+    if r.status_code==200:
+        for chunk in r.iter_content(chunk_size=64):
+            if chunk:
+                print(chunk.decode("utf-8"), end="", flush=True)
+
+
 # Here we generate the test script:
 # we can accept tuple: (models, loras) if we want to do lora later?
 # want to accept questions[] list, or file.
@@ -115,7 +130,8 @@ def test_model(models):
 if __name__ == "__main__":
     # Generate response:
     try:
-        gen_time = time_function_execution( generate, sys.argv[1] )
+        #gen_time = time_function_execution( generate, sys.argv[1] )
+        gen_time = time_function_execution( chatgpt, sys.argv[1] )
     except:
         print('Missing arguments, try: python3 fastapi_request.py "hello"')
 
