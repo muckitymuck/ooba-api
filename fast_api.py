@@ -28,6 +28,9 @@ def get_available_models():
 
 
 def get_available_loras():
+    print("lora dir?")
+    print(shared.args.model_dir)
+    print("_____")
     # need to generalize this path using relative path.. lazy..
     result = subprocess.run(['ls', '-l', '/home/nap/Documents/llm-api/loras/'], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8')
@@ -261,6 +264,10 @@ def get_tokens(req: TokenizeRequest):
 @app.get("/tokens")
 def get_tokens(req: str):
     input_ids = encode(req)[0]
+    print(req)
+    print("---")
+    print(input_ids)
+    print("----")
     return { "token_count": len(input_ids), "tokens": input_ids }
 
 
