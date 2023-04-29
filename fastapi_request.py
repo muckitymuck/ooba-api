@@ -99,14 +99,15 @@ if __name__ == "__main__":
     #gen_time = time_function_execution( generate, sys.argv[1] )
 
     # Get, Set modals:
-    #print( get_models() )
-    print( set_model("vicuna-13B-1.1-4bit") )
+    print( get_models() )
+    #print( set_model("vicuna-13B-1.1-4bit") )
 
     # Get, Set text:
     #print( get_loras() )
     #print( set_loras(["homer"]) )
 
     # Test model:
+    #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model("vicuna-13B-1.1-4bit")
     #test_model(["llamaOG-13B-hf", "koala-13B-HF"])
 

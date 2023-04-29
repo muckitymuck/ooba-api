@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import asyncio
@@ -26,6 +27,7 @@ def get_available_models():
 
 
 def get_available_loras():
+    # need to generalize this path using relative path.. lazy..
     result = subprocess.run(['ls', '-l', '/home/nap/Documents/llm-api/loras/'], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8')
 
@@ -174,6 +176,7 @@ async def stream_data(req: GenerateRequest):
                 _len = len(last_answer)
 
                 yield _answ.encode("utf-8")
+            print("after gen")
 
         return StreamingResponse(gen())
     except Exception as e:
