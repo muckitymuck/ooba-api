@@ -77,9 +77,10 @@ class GenerateRequest(BaseModel):
     add_bos_token: Optional[bool] = True
     truncation_length: Optional[int] = 2048
     custom_stopping_strings: Optional[str] = ''
-    ban_eos_token: Optional[bool] =False
-    skip_special_tokens: Optional[bool] =False
-    streaming: Optional[bool] =True
+    ban_eos_token: Optional[bool] = False
+    skip_special_tokens: Optional[bool] = False
+    streaming: Optional[bool] = True
+    log: Optional[bool] = True
 
 
 @app.get("/")

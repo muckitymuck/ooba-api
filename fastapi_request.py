@@ -53,6 +53,7 @@ def generate(message):
     data = {
         "prompt": message,
         "temperature": 0.7,
+        "log": True
         #"streaming": False
     }
 
