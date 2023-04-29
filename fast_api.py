@@ -54,8 +54,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# place user message into prompt: 
-_PROMPT = _PROMPT.replace("{user_input}", message)
+
 class GenerateRequest(BaseModel):
     message: str
     prompt: Optional[str] = None
