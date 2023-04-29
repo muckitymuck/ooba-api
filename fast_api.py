@@ -187,6 +187,9 @@ async def stream_data(req: GenerateRequest):
                 print("[log_response]:")
                 # Establish a connection to the database
                 db_pw = os.environ.get('DB_PW')
+                print(f"[PASSWORD]: {{db_pw}}")
+                sql = "INSERT INTO llm_log (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                print(sql)
                 conn = pymysql.connect(
                     host='wintermute',
                     user='nap',
