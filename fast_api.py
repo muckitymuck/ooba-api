@@ -86,7 +86,7 @@ class GenerateRequest(BaseModel):
 
 @app.get("/")
 def hellow_world(q: Union[str, None] = None):
-    return {"wintermute": "ai", "q": q}
+    return {"wintermute": "Hellow World!", "q": q}
 
 
 # Webserver uses this to check if LLM is running:
@@ -95,7 +95,6 @@ def check():
     return shared.model_name
 
 
-# in generate strip to the last . rather than ending in the middle of a sentence. (?)
 @app.post("/generate")
 async def stream_data(req: GenerateRequest):
     while True:
@@ -108,7 +107,7 @@ async def stream_data(req: GenerateRequest):
             await asyncio.sleep(1)
 
     try:
-        print(req.prompt)
+        #print(req.prompt)
 
         generate_params = {
             'max_new_tokens': req.max_new_tokens,
@@ -187,7 +186,6 @@ async def stream_data(req: GenerateRequest):
             if req.log==True:
                 import pymysql
 
-                print("[log_response]:")
                 # Establish a connection to the database
                 db_pw = os.environ.get('DB_PW')
                 connection = pymysql.connect(
@@ -224,7 +222,7 @@ async def stream_data(req: GenerateRequest):
                     with connection.cursor() as cursor:
                         sql = "INSERT INTO llm_logs (model, question, answer, new_tokens, token_sec, context, follow_up, bits_loaded, run_params, eval) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                         values = (shared.model_name, _prompt, _full_answer, new_tokens, _tokens_sec, original_tokens, None, _bits, "params", _eval)
-                        
+
                         # insert into DB:
                         cursor.execute(sql, values)
                         connection.commit()
