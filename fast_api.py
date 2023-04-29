@@ -254,11 +254,14 @@ class TokenizeRequest(BaseModel):
 # endpoint for getting # of tokens:
 @app.post("/tokens")
 def get_tokens(req: TokenizeRequest):
-    input_ids = encode(req.prompt)[0]
     print(req.prompt)
-    print("---")
+    og = encode(req.prompt)
+    print(og)
+    print("____")
+    input_ids = encode(req.prompt)[0]
     print(input_ids)
     print("----")
+    #print("---")
     return { "token_count": len(input_ids), "tokens": input_ids }
 
 
