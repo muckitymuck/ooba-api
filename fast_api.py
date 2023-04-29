@@ -261,7 +261,7 @@ def get_tokens(req: TokenizeRequest):
 
 # sure, why not.. a get endpoint too
 @app.get("/tokens/{prompt}")
-def get_tokens():
+def get_tokens(prompt: str):
     input_ids = encode(prompt)[0]
     integer_list = [int(x) for x in input_ids.tolist()]
     return { "token_count": len(input_ids), "tokens": integer_list }
