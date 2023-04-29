@@ -212,7 +212,7 @@ async def stream_data(req: GenerateRequest):
                 # tokens/sec:
                 t1 = time.time()
                 original_tokens = len(encode(req.prompt))
-                new_tokens = len(encode(_full_answer) - original_tokens
+                new_tokens = len(encode(_full_answer)) - original_tokens
                 print(f'init: Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens})')
 
                 # Execute an insert query
