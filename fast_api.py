@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import pymysql
 import asyncio
 import uvicorn
 import subprocess
@@ -158,6 +159,7 @@ async def stream_data(req: GenerateRequest):
             answer = ""
             answer_str = ""
             last_answer = ""
+            _full_answer = ""
             for a in generator:
                 if isinstance(a, str):
                     answer = a
@@ -175,8 +177,45 @@ async def stream_data(req: GenerateRequest):
                 last_answer = answer
                 _len = len(last_answer)
 
+                _full_answer += _answ.encode("utf-8")
+
                 yield _answ.encode("utf-8")
-            print("after gen")
+
+            if req.log==True:
+                print("[log_response]:")
+                # Establish a connection to the database
+                db_pw = os.environ.get('DB_PW')
+                conn = pymysql.connect(
+                    host='wintermute',
+                    user='nap',
+                    password=f'{db_pw}',
+                    database='llm_log',
+                    charset='utf8mb4',
+                    cursorclass=pymysql.cursors.DictCursor
+                )
+
+                # get bits:
+                _bits = 0
+                if shared.args.wbits == 0:
+                    if shared.args.load_in_8bit:
+                        _bits = 8
+                    else:
+                        _bits = 16
+                else:
+                    _bits = shared.args.wbits
+
+                # Execute an insert query
+                try:
+                    with connection.cursor() as cursor:
+                        sql = "INSERT INTO llm_log (model, question, answer, token_sec, bits_loaded, run_params, follow_up) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                        print(sql)
+                        values = (shared.model_name, req.prompt, _full_answer, 0, _bits, "params", None)
+                        cursor.execute(sql, values)
+                        connection.commit()
+                        print(cursor.rowcount, "record inserted.")
+                finally:
+                    # Close the connection
+                    connection.close()
 
         return StreamingResponse(gen())
     except Exception as e:
@@ -213,13 +252,6 @@ def set_loras(req: LoraRequest):
             return { "err": str(e) }
 
 
-# clear loras:
-#@app.get("/clear_loras")
-#def clear_loras():
-#    add_lora_to_model([])
-#    return { "lora": shared.lora_names } 
-
-
 # get models:
 @app.get("/models")
 def get_models():
@@ -241,25 +273,18 @@ def set_model(req: ModelRequest):
             print(f"loading new model: {req.model}")
             unload_model()
 
-            print("[before]:")
-            print(shared.model_name)
-            print(shared.model_type)
-            print(shared.args.wbits)
-            print(shared.args.groupsize)
-            print(shared.args.load_in_8bit)
-
             if "4bit" in req.model.lower():
-                print("4b")
+                #print("4b")
                 shared.args.wbits = 4
                 shared.args.groupsize = 128
             else:
                 if "7b" in req.model.lower():
-                    print("7b")
+                    #print("7b")
                     shared.args.wbits = 0
                     shared.args.groupsize = -1
                     shared.args.load_in_8bit = False
                 else:
-                    print("other")
+                    #print("other")
                     shared.args.wbits = 0
                     shared.args.groupsize = -1
                     shared.args.load_in_8bit = True
@@ -268,31 +293,28 @@ def set_model(req: ModelRequest):
             if "OPT" in req.model.lower():
                 shared.model_type = "OPT"
             else: 
-                shared.model_type = "HF_generic" #? llama, etc
+                shared.model_type = "HF_generic"
 
             # Set new model name!
             shared.model_name = req.model
-
-            print("[after]:")
-            print(shared.model_name)
-            print(shared.model_type)
-            print(shared.args.wbits)
-            print(shared.args.groupsize)
-            print(shared.args.load_in_8bit)
-            
             
             shared.model, shared.tokenizer = load_model(shared.model_name)
         except Exception as e:
             return { "err": str(e) }
 
-        return { "model": shared.model_name } #(shared.model_name, shared.wbits) 
+        _bits = 0
+        if shared.args.wbits == 0:
+            if shared.args.load_in_8bit:
+                _bits = 8
+            else:
+                _bits = 16
+        else:
+            _bits = shared.args.wbits
+
+        return { "model": shared.model_name, "bits": _bits, "groupsize": shared.args.groupsize  } #(shared.model_name, shared.wbits) 
     else:
         models_str = ", ".join(available_models)
         return { "err": "model not in list: [{0}] {1}".format(models_str, model) }
-
-    print(model)
-    # maybe i can normalize the names so we can let ooba guess how to run it. we should test with show-models
-    # ^ might need to manually set these so ooba is set correctly.
 
 
 if __name__ == "__main__":
