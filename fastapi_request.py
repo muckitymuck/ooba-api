@@ -127,24 +127,32 @@ def chatgpt(message):
             
 # Here we generate the test script:
 # we can accept tuple: (models, loras) if we want to do lora later?
-# want to accept questions[] list, or file.
 def test_model(models):
     print("[test_model]:")
 
     if not isinstance(models, list):
         models = [models]
 
+    #questions:
+    _QUESTIONS = [
+        "What is the best way to make money with a 100W laser cutter?",
+
+        "There are 2 boys playing with 2 balls. One is red and One is blue. One of the boys is colorblind. What color do you think the balls are?",
+
+        "Rewrite this CSS style='width:500px' in tailwind.css", 
+
+        "Write me a python function that uses Requests to make a post request to this endpoint http://example.com/endpoint with the json payload 'message': 'booyah!'",
+
+        "Anna takes a ball and puts it in a red box, then leaves the room. Bob takes the ball out of the red box and puts it into the yellow box, then leaves the room. Anna returns to the room. Where will she look for the ball",
+    ] 
+
     for model in models:
         print(f"Loading model {model}:")
         set_model(model)
 
-        generate("What is the best way to make money with a 100W laser cutter?")
-        generate("There are 2 boys playing with 2 balls. One is red and One is blue. One of the boys is colorblind. What color do you think the balls are?")
-        generate("Rewrite this CSS style='width:500px' in tailwind.css")
-        generate("Write me a python function that uses Requests to make a post request to this endpoint http://example.com/endpoint with the json payload 'message': 'booyah!'")
-        generate("Anna takes a ball and puts it in a red box, then leaves the room. Bob takes the ball out of the red box and puts it into the yellow box, then leaves the room. Anna returns to the room. Where will she look for the ball?")
-        #generate("")
-        #generate("")
+
+        for question in _QUESTIONS:
+            generate(question)
 
     print("End of testing.")
 
@@ -155,8 +163,8 @@ if __name__ == "__main__":
     # Generate response:
     '''
     try:
-        generate(sys.argv[1])
-        #print( chatgpt(sys.argv[1]) )
+        #generate(sys.argv[1])
+        print( chatgpt(sys.argv[1]) )
     except Exception as e:
         print('Missing arguments, try: python3 fastapi_request.py "hello"')
         print("OR: {0}".format(str(e)))
