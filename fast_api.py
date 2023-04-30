@@ -116,7 +116,6 @@ async def stream_data(req: GenerateRequest):
             _MESSAGE = req.prompt.replace("{user_input}", req.message)
         else:
             _MESSAGE = req.message
-        print(_MESSAGE)
 
         generate_params = {
             'max_new_tokens': req.max_new_tokens,

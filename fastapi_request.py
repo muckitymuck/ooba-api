@@ -147,14 +147,19 @@ def test_model(models):
     ] 
 
     for model in models:
-        print(f"Loading model {model}:")
+        print(f"[Loading model]: {model}")
         set_model(model)
 
+        # decide format:
+        if "alpaca" in model.lower():
+            _format="instruct"
+        elif "vicuna" in model.lower():
+            _format="chat"
 
         for question in _QUESTIONS:
-            generate(question)
+            generate(question)#,_format
 
-    print("End of testing.")
+    print("\n\n[fin.]")
 
 
 #-------
@@ -175,14 +180,14 @@ if __name__ == "__main__":
 
     # Get, Set modals:
     #print( get_models() )
-    #print( set_model("vicuna-13B-1.1-4bit") )
+    #print( set_model("alpaca-lora-65B.GGML.q4bit_2.bin") )
 
     # Get, Set text:
     #print( get_loras() )
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("vicuna-13B-1.1-4bit")
+    test_model("vicuna13b-4bit-cpp")
     #test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
