@@ -53,6 +53,9 @@ def generate(message, format="instruct"):
     elif "chat" in format.lower():
         _PROMPT = """User: {user_input}
 AI:"""
+    elif "vicuna" in format.lower():
+        _PROMPT = """human: {user_input}
+gpt:"""
     else:
         print("instruct format mismatch")
         _PROMPT = "" #message
@@ -154,10 +157,10 @@ def test_model(models):
         if "alpaca" in model.lower():
             _format="instruct"
         elif "vicuna" in model.lower():
-            _format="chat"
+            _format="vicuna"
 
         for question in _QUESTIONS:
-            generate(question)#,_format
+            generate(question, _format)
 
     print("\n\n[fin.]")
 
