@@ -154,10 +154,11 @@ def test_model(models):
         set_model(model)
 
         # decide format:
-        if "alpaca" in model.lower():
-            _format="instruct"
-        elif "vicuna" in model.lower():
+        
+        if "vicuna" in model.lower():
             _format="vicuna"
+        else: #"alpaca" in model.lower():
+            _format="instruct"
 
         for question in _QUESTIONS:
             generate(question, _format)
@@ -190,7 +191,7 @@ if __name__ == "__main__":
     #print( set_loras(["homer"]) )
 
     # Test model:
-    test_model("vicuna13b-4bit-cpp")
-    #test_model("koala-13B-HF-4bit")
+    #test_model("vicuna13b-4bit-cpp")
+    test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
