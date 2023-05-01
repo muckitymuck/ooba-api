@@ -66,7 +66,7 @@ gpt:"""
         "message": message, 
         "temperature": 0.7, # set to 1 for evals for reproducability?
         "log": True,
-        #"streaming": False
+        "evl": 1 #eval
     }
 
     r = requests.post("http://wintermute:7861/generate", data=json.dumps(data), stream=True)
