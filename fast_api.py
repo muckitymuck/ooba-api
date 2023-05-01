@@ -82,6 +82,7 @@ class GenerateRequest(BaseModel):
     skip_special_tokens: Optional[bool] = False
     streaming: Optional[bool] = True
     log: Optional[bool] = True
+    evl: Optional[int] = 1
 
 
 # Booyah!
@@ -225,13 +226,12 @@ async def stream_data(req: GenerateRequest):
                 _full_answer = _full_answer.replace('\n', '\\n')
                 _tokens_sec = new_tokens/(t1-t0)
                 _params = ' '.join(sys.argv[1:])
-                # prompt and eval can be tied because of the different ways I submit these requests:
+                _eval = req.evl
+
                 if req.prompt:
                     _prompt = req.prompt.replace('\n', '\\n')
-                    _eval = 1
                 else:
                     _prompt = None
-                    _eval = 0
 
                 # Execute an insert query
                 try:
