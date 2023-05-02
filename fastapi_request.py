@@ -41,24 +41,23 @@ def set_model(model_name):
     return r.json()
 
 
-def generate(message, format="instruct"):
+def generate(message, prompt=""):
     #set prompt, change prompt: maybe move this into it's own fucntion:
-    if "instruct" in format.lower():
+    if "instruct" in prompt.lower():
         _PROMPT = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
 {user_input}
 ### Response:"""
-    elif "complete" in format.lower():
+    elif "complete" in prompt.lower():
         _PROMPT = "{user_input} "
-    elif "chat" in format.lower():
+    elif "chat" in prompt.lower():
         _PROMPT = """User: {user_input}
 AI:"""
-    elif "vicuna" in format.lower():
+    elif "vicuna" in prompt.lower():
         _PROMPT = """human: {user_input}
 gpt:"""
     else:
-        print("instruct format mismatch")
-        _PROMPT = "" #message
+        _PROMPT = prompt
 
     # setup json payload:
     data = {
@@ -156,12 +155,12 @@ def test_model(models):
         # decide format:
         
         if "vicuna" in model.lower():
-            _format="vicuna"
+            _prompt="vicuna"
         else: #"alpaca" in model.lower():
-            _format="instruct"
+            _prompt="instruct"
 
         for question in _QUESTIONS:
-            generate(question, _format)
+            generate(question, _prompt)
 
     print("\n\n[fin.]")
 
@@ -184,7 +183,7 @@ if __name__ == "__main__":
 
     # Get, Set modals:
     #print( get_models() )
-    #print( set_model("alpaca-lora-65B.GGML.q4bit_2.bin") )
+    print( set_model("alpaca-30b-lora-4bit-128g") )
 
     # Get, Set text:
     #print( get_loras() )
@@ -192,6 +191,6 @@ if __name__ == "__main__":
 
     # Test model:
     #test_model("vicuna13b-4bit-cpp")
-    test_model("koala-13B-HF-4bit")
+    #test_model("koala-13B-HF-4bit")
     #test_model(["alpaca-30b-lora-4bit-128g"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
