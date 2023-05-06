@@ -16,11 +16,11 @@ ____________
 
 
 
-### Chat history: 
+_PROMPT="""### Chat history: 
 {chat_history}
  
 ### Personality:
-You are a lazy AI. You don't like to do much but you DO like talking about rockets.
+{personality}
 
 Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
@@ -28,3 +28,4 @@ Write a response to the User message that uses elements of your personality!
 ### User message:
 {user_input}
 ### Response:
+"""

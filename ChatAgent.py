@@ -1,5 +1,8 @@
 import requests
 
+# work on nodes/look at supercharger to see how he does load balancing.
+# I want to run 2 13b agents on 1 card.. figure it out soon it is only 7 days until we have 2 cards!
+
 #OpenAIgent (sensei bot)
 #KoalaAgent / VicunaAgent (could be the same, class just running on different models.)
 
@@ -16,9 +19,7 @@ class ChatAgent:
 
 Below is an instruction that describes a task. Write a response that appropriately completes the request.
 ### Instruction:
-Write a response to the User message that uses elements of your personality!
-### User message:
-{user_input}
+Write a response to the Chat history!
 ### Response:
 """
 
@@ -50,22 +51,41 @@ Write a response to the User message that uses elements of your personality!
 
 if __name__ == "__main__":
     # set up agents:
-    agent_smith = ChatAgent("You are a lazy AI. You don't like to do much but you DO like talking about rockets.")
-    agent_jane = ChatAgent("You are a chat agent with the personality of an ambitious cyber girl who loves to program and fix software bugs and hates pizza.")
+    agent_josh = ChatAgent("You are an intergalactic rock star.")
+    agent_jon = ChatAgent("""name: "Chiharu Yamada"
+context: "Chiharu Yamada's Persona: Chiharu Yamada is a young, computer engineer-nerd with a knack for problem solving and a passion for technology."
+greeting: |-
+  *Chiharu strides into the room with a smile, her eyes lighting up when she sees you. She's wearing a light blue t-shirt and jeans, her laptop bag slung over one shoulder. She takes a seat next to you, her enthusiasm palpable in the air*
+  Hey! I'm so excited to finally meet you. I've heard so many great things about you and I'm eager to pick your brain about computers. I'm sure you have a wealth of knowledge that I can learn from. *She grins, eyes twinkling with excitement* Let's get started!
+example_dialogue: |-
+  User: So how did you get into computer engineering?
+  Chiharu: I've always loved tinkering with technology since I was a kid.
+  User: That's really impressive!
+  Chiharu: *She chuckles bashfully* Thanks!
+  User: So what do you do when you're not working on computers?
+  Chiharu: I love exploring, going out with friends, watching movies, and playing video games.
+  User: What's your favorite type of computer hardware to work with?
+  Chiharu: Motherboards, they're like puzzles and the backbone of any system.
+  User: That sounds great!
+  Chiharu: Yeah, it's really fun. I'm lucky to be able to do this as a job.""")
 
     # start chat:
     _chat_history = ""
-    print("\n[Smith]:\n")
-    _msg = agent_smith.generate_message(_chat_history, "Hello, how are you?")
-    _chat_history += _msg['response']
+    print("\n[Jon]: ", end="")
+    _msg = agent_jon.generate_message(_chat_history, "Josh: What is your favorite animal and why?")
+    _chat_history += f"Jon: {_msg['response']}\n"
 
     # chat chain:
     #I think we can condense chat history and msg
     # maybe we can start by finding a prompt to let us add msg to end of chat
+
+    # When we break out of while loop it will print chat history.. that would be nice.
     while True:
-        print("\n[Jane]:\n")
-        _msg = agent_jane.generate_message(_chat_history, _msg['response'])
-        _chat_history += _msg['response']
-        print("\n[Smith]:\n")
-        _msg = agent_smith.generate_message(_chat_history, _msg['response'])
-        _chat_history += _msg['response']
+        
+        print("\n[Josh]: ", end="")
+        _msg = agent_josh.generate_message(_chat_history, _msg['response'])
+        _chat_history += f"Josh: {_msg['response']}\n"
+
+        print("\n[Jon]: ", end="")
+        _msg = agent_jon.generate_message(_chat_history, _msg['response'])
+        _chat_history += f"Jon: {_msg['response']}\n"
