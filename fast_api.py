@@ -139,7 +139,7 @@ async def stream_data(req: GenerateRequest):
             'custom_stopping_strings': req.custom_stopping_strings,
             'ban_eos_token': req.ban_eos_token,
             'skip_special_tokens': req.skip_special_tokens,
-            'streaming': req.streaming
+            'stream': req.streaming
         }
         #print(generate_params)
 

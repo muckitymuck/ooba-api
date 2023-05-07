@@ -187,10 +187,11 @@ if __name__ == "__main__":
 
     # Get, Set text:
     #print( get_loras() )
+    print( set_loras(["LettersOfInsurgents"]) )
     #print( set_loras(["homer"]) )
 
     # Test model:
     #test_model("alpaca-30b-lora-4bit-128g")
     #test_model("koala-13B-HF-4bit")
-    test_model(["GPT4-X-Alpaca-30B-4bit","OpenAssistant-SFT-7-Llama-30B-GPTQ"])
+    #test_model(["GPT4-X-Alpaca-30B-4bit","OpenAssistant-SFT-7-Llama-30B-GPTQ"])
     #test_model(["vicuna-13B-1.1-4bit", "koala-13B-HF"])
