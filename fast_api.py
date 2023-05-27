@@ -94,7 +94,7 @@ def hellow_world(q: Union[str, None] = None):
 # Webserver uses this to check if LLM is running:
 @app.get("/check")
 def check():
-    return shared.model_name
+    return { shared.model_name }
 
 
 # FastAPI endpoint to view all or single results from llm_logs!!
