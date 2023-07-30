@@ -298,15 +298,17 @@ def generate_reply_HF(question, original_question, seed, state, eos_token=None, 
 def generate_reply_custom(question, original_question, seed, state, eos_token=None, stopping_strings=None, is_chat=False):
     seed = set_manual_seed(state['seed'])
     generate_params = {'token_count': state['max_new_tokens']}
+
     for k in ['temperature', 'top_p', 'top_k', 'repetition_penalty']:
         generate_params[k] = state[k]
 
     if shared.model_type == 'llamacpp':
         for k in ['mirostat_mode', 'mirostat_tau', 'mirostat_eta']:
-            generate_params[k] = state.get(k, default_value)
+            generate_params[k] = state.get(k, default_value)  # Replace 'default_value' with the actual default value you want to use
 
     t0 = time.time()
     reply = ''
+
     try:
         if not is_chat:
             yield ''
