@@ -304,7 +304,7 @@ def generate_reply_custom(question, original_question, seed, state, eos_token=No
 
     if shared.model_type == 'llamacpp':
         for k in ['mirostat_mode', 'mirostat_tau', 'mirostat_eta']:
-            generate_params[k] = state.get(k, default_value)  # Replace 'default_value' with the actual default value you want to use
+            generate_params[k] = state.get(k, 2)  # Replace 'default_value' with the actual default value you want to use
 
     t0 = time.time()
     reply = ''
