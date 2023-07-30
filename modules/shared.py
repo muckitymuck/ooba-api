@@ -4,9 +4,12 @@ from pathlib import Path
 
 import yaml
 
+import threading
+
 from modules.logging_colors import logger
 
-generation_lock = None
+#generation_lock = None
+generation_lock == threading.Lock()
 model = None
 tokenizer = None
 model_name = "None"
